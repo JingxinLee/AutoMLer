@@ -6,10 +6,11 @@ from dotenv import load_dotenv, find_dotenv
 import numpy as np
 from torchvision import transforms
 from transformers import AutoTokenizer
-import torchvision.transforms as T
 import augly.text as textaugs
+from PIL import Image
+import torchaudio
 
-from processfiles import infer_data_modality, infer_folder_modality, infer_modality
+from preprocess import infer_data_modality, infer_folder_modality, infer_modality, normalize_text, normalize_image, normalize_audio, normalize_video
 
 
 _ = load_dotenv(find_dotenv())  # read local .env file
@@ -43,43 +44,20 @@ def text2image(prompt, steps):
     image.save(f"{prompt}.png")
     
 
-# Normalize 
 
+    
 def normalize(modality):
-    def normalize_text():
-        tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-        def tokenize_function(examples):
-            return tokenizer(examples['text'], padding='max_length', truncation=True, max_length=512)
-        return tokenize_function
-    
-    def normalize_image(examples):
-        transform = transforms.Compose([
-            transforms.Resize((256, 256)),  # 调整图像大小
-            transforms.ToTensor(),          # 将图像转换为 PyTorch Tensor
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
-            ])
-        # images = [transform(Image.open(io.BytesIO(image))) for image in examples['image']]
-        # return {'image': images}
-        return transform
-        
-    def normalize_audio():
-        pass
-    
-    def normalize_video():
-        transform = T.Compose([
-            T.ToTensor(),
-            T.Resize((256, 256)),  # 调整帧的大小
-            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
-            ])
-        
     if modality == "text":
-        return normalize_text
+        normalize_function = normalize_text
     if modality == "image":
-        normalize_image()
+        normalize_function = normalize_image
     if modality == "audio":
-        normalize_audio()
+        normalize_function = normalize_audio
     if modality == "video":
-        normalize_video()
+        normalize_function = normalize_video
+    else:
+        raise ValueError("The modality is not supported.")
+    return normalize_function
 
 
 # Augmentator

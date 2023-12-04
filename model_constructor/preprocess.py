@@ -3,6 +3,97 @@ import requests
 import io
 import base64
 from PIL import Image
+from torchvision import transforms
+import os
+import torchaudio
+from torchvision.io import read_video
+from langchain.document_loaders import UnstructuredMarkdownLoader
+from collections import Counter
+
+
+def process_markdown_batch(markdown_files):
+    batch_docs = []
+    for markdown_file_path in markdown_files:
+        markdown_loader = UnstructuredMarkdownLoader(markdown_file_path)
+        batch_docs.extend(markdown_loader.load())
+    return batch_docs
+
+
+def iterate_folder_files(root_directory, markdown_files_to_process=[]):
+    for root, dirs, files in os.walk(root_directory):
+        markdown_files_to_process.extend(
+            [os.path.join(root, file) for file in files if file.lower().endswith(".md")]
+        )
+
+    return markdown_files_to_process
+
+
+def process_files_batch(
+    process_function,
+    markdown_files_to_process=[],
+    batch_size=1,
+    docs=[],
+    processed_files=0,
+):
+    for i in range(0, len(markdown_files_to_process), batch_size):
+        batch = markdown_files_to_process[i : i + batch_size]
+        batch_docs = list(map(process_function, [batch]))
+        for batch_result in batch_docs:
+            docs.extend(batch_result)
+            # print(docs)
+            processed_files += len(batch)
+            # print(f"Processed {processed_files} / {len(markdown_files_to_process)} files")
+    return docs
+
+
+def infer_data_modality(file_path):
+    image_extensions = [".jpg", ".jpeg", ".png", ".bmp", ".tiff"]
+    text_extensions = [".txt", ".csv", ".json", ".xml", ".md"]
+    audio_extensions = [".wav", ".mp3", ".flac", ".aac"]
+
+    _, ext = os.path.splitext(file_path)
+    if ext in image_extensions:
+        return "image"
+    elif ext in text_extensions:
+        return "text"
+    elif ext in audio_extensions:
+        return "audio"
+    else:
+        return "unknown"
+
+
+def infer_folder_modality(folder_path):
+    image_extensions = [".jpg", ".jpeg", ".png", ".bmp", ".tiff"]
+    text_extensions = [".txt", ".csv", ".json", ".xml", ".md"]
+    audio_extensions = [".wav", ".mp3", ".flac", ".aac"]
+
+    extensions = []
+    for file in os.listdir(folder_path):
+        if os.path.isfile(os.path.join(folder_path, file)):
+            _, ext = os.path.splitext(file)
+            extensions.append(ext)
+
+    if extensions:
+        most_common_ext, _ = Counter(extensions).most_common(1)[0]
+        if most_common_ext in image_extensions:
+            return "image"
+        elif most_common_ext in text_extensions:
+            return "text"
+        elif most_common_ext in audio_extensions:
+            return "audio"
+        else:
+            return "unknown"
+    else:
+        return "empty"
+
+
+def infer_modality(path):
+    if os.path.isfile(path):
+        return infer_data_modality(path)
+    elif os.path.isdir(path):
+        return infer_folder_modality(path)
+    else:
+        return "invalid"
 
 
 # 1. PandaGPT -> Text
@@ -183,6 +274,145 @@ def text2image(prompt, steps):
     image.save(f"{prompt}.png")
     
 
+# Normalize 
+def normalize_text(examples):
+    tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+    def tokenize_function(examples):
+        return tokenizer(examples['text'], padding='max_length', truncation=True, max_length=512)
+    return tokenize_function(examples)
+
+def normalize_image(examples):
+    transform = transforms.Compose([
+        transforms.Resize((256, 256)),  # 调整图像大小
+        transforms.ToTensor(),          # 将图像转换为 PyTorch Tensor
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
+        ])
+    def apply_transform(examples):
+        images = [transform(Image.open(io.BytesIO(image))) for image in examples['image']]
+        return {'image': images}
+    return apply_transform(examples)
+    
+def normalize_audio(examples):
+    def apply_transform(examples):
+        audios = [torchaudio.load(ex['audio'])[0] / torch.max(torch.abs(torchaudio.load(ex['audio'])[0])) for ex in examples]
+        return {'audio': audios}
+    return apply_transform(examples)
+
+
+def normalize_video(examples):
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Resize((256, 256)),  # 调整帧的大小
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
+        ])
+    def apply_transform(examples):
+        normalized_videos = []
+        for video_file in examples['video_file']:
+            # 读取视频
+            video, _, _ = read_video(video_file)
+            # 归一化
+            video = video / 255.0
+            normalized_video = transform(video)
+            normalized_videos.append(normalized_video)
+
+        return {'video': normalized_videos}
+    return apply_transform(examples)
+  
+# # Normalize  with folder
+# Text 
+def normalize_text_file(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        text = file.read()
+
+    # 基本的文本清洗，如转换为小写
+    text = text.lower()
+
+    return text
+
+def normalize_text_folder(folder_path):
+    normalized_texts = []
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        if os.path.isfile(file_path) and file_path.endswith('.txt'):
+            normalized_text = normalize_text_file(file_path)
+            normalized_texts.append(normalized_text)
+
+    return normalized_texts
+
+# Image
+def normalize_image_folder(folder_path):
+    transform = transforms.Compose([
+        transforms.Resize((256, 256)),  # 调整图像大小
+        transforms.ToTensor(),          # 将图像转换为 PyTorch Tensor
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
+    ])
+
+    normalized_images = []
+
+    # 遍历文件夹中的所有文件
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        # 检查是否为文件
+        if os.path.isfile(file_path):
+            try:
+                # 打开并应用转换
+                with open(file_path, 'rb') as file:
+                    image = Image.open(io.BytesIO(file.read())).convert('RGB')
+                    normalized_images.append(transform(image))
+            except IOError:
+                print(f"Could not open or read the file {file_path}")
+
+    return normalized_images
+
+# video 
+def normalize_video_file(file_path):
+    video, _, _ = read_video(file_path)
+
+    # 定义归一化转换
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    video = video / 255.0
+    normalized_video = normalize(video)
+
+    return normalized_video
+
+def normalize_video_folder(folder_path):
+    normalized_videos = []
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        if os.path.isfile(file_path) and file_path.endswith(('.mp4', '.avi')):
+            normalized_video = normalize_video_file(file_path)
+            normalized_videos.append(normalized_video)
+
+    return normalized_videos
+
+# Audio 
+def load_and_normalize_audio(filename):
+    # 加载音频文件
+    waveform, sample_rate = torchaudio.load(filename)
+
+    # 归一化音频波形
+    waveform = waveform / torch.max(torch.abs(waveform))
+
+    return waveform, sample_rate
+
+def normalize_audio_folder(folder_path):
+    normalized_audios = []
+
+    # 遍历文件夹中的所有文件
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        # 检查是否为音频文件
+        if os.path.isfile(file_path) and file_path.endswith(('.wav', '.mp3', '.flac')):
+            normalized_waveform, sample_rate = load_and_normalize_audio(file_path)
+            normalized_audios.append((normalized_waveform, sample_rate))
+
+    return normalized_audios
 
 # if __name__ == "__main__":
     # text2image(prompt='Draw a picture of a cat', steps=5)
