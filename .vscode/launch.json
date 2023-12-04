@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
-            "python": "/Users/jingxinli/opt/anaconda3/envs/openai/bin/python",
+            "python": "/root/anaconda3/envs/paper/bin/python",
             "program": "${file}",
             "purpose": [
                 "debug-in-terminal"
