@@ -5,11 +5,16 @@ import base64
 from PIL import Image
 from torchvision import transforms
 import os
+import random
 import torchaudio
 from torchvision.io import read_video
 from langchain.document_loaders import UnstructuredMarkdownLoader
 from collections import Counter
-
+import augly.text as textaugs
+import augly.image as imaugs
+import augly.audio as audaugs
+from augly.audio.utils import validate_and_load_audio
+import augly.video as vidaugs
 
 def process_markdown_batch(markdown_files):
     batch_docs = []
@@ -274,7 +279,7 @@ def text2image(prompt, steps):
     image.save(f"{prompt}.png")
     
 
-# Normalize 
+################################ Normalize ###################################
 def normalize_text(examples):
     tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
     def tokenize_function(examples):
@@ -318,7 +323,7 @@ def normalize_video(examples):
         return {'video': normalized_videos}
     return apply_transform(examples)
   
-# # Normalize  with folder
+############# Normalize  with folder #################################
 # Text 
 def normalize_text_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -414,5 +419,69 @@ def normalize_audio_folder(folder_path):
 
     return normalized_audios
 
-# if __name__ == "__main__":
-    # text2image(prompt='Draw a picture of a cat', steps=5)
+########################### Augmentator ###########################
+
+def augment_text(aug_text):
+    aug  = [
+        # textaugs.simulate_typos(aug_text),
+        textaugs.replace_words(aug_text),
+        textaugs.SwapGenderedWords(aug_word_p=1.0)(aug_text),
+        textaugs.replace_fun_fonts(aug_text, vary_fonts=True, granularity="word", metadata=[]),
+        textaugs.ReplaceSimilarUnicodeChars(aug_word_p=0.6)(aug_text, metadata=[]),
+        textaugs.Contractions(aug_p=1.0)(aug_text),
+    ]
+    return random.choice(aug) 
+
+def augment_image(aug_image):
+    aug = [
+        imaugs.blur(aug_image,radius=random.randint(1,2)),                     # 图像模糊
+        imaugs.brightness(aug_image,factor=random.uniform(0.5,1.5)),           # 改变亮度
+        imaugs.change_aspect_ratio(aug_image, ratio=random.uniform(0.8,1.5)),  # 改变图像宽高比
+        imaugs.color_jitter(aug_image, brightness_factor=random.uniform(0.8,1.5), contrast_factor=random.uniform(0.8,1.5), saturation_factor=random.uniform(0.8,1.5)),    # 颜色晃动
+        imaugs.crop(aug_image, x1=random.uniform(0,0.1), y1=random.uniform(0,0.1), x2=random.uniform(0.9,1), y2=random.uniform(0.9,1)),     # 随机裁剪
+        imaugs.hflip(aug_image),                                               # 水平翻转
+        imaugs.opacity(aug_image, level=random.uniform(0.5,1)),                # 改变图像透明度
+        imaugs.pixelization(aug_image, ratio=random.uniform(0.5,1)),           # 马赛克
+        imaugs.random_noise(aug_image),                                        # 随机噪声
+        imaugs.rotate(aug_image, degrees=random.randint(3,10)),                # 随机旋转一定角度
+        imaugs.shuffle_pixels(aug_image, factor=random.uniform(0,0.1)),        # 随机像素比任意化
+        imaugs.saturation(aug_image, factor=random.uniform(1,1.5)),            # 改变饱和度
+        imaugs.contrast(aug_image, factor=random.uniform(1,1.5)),              # 对比度增强
+        imaugs.grayscale(aug_image)                                            # 转灰度
+    ]
+    return random.choice(aug)                                                   # 从以上函数中随机选其一进行数据增强
+
+# 图像增强示例代码
+# img_path = "img"                              # 需要增强的图像路径
+# save_path = "save"                           # 保存路径
+# for name in os.listdir(img_path):
+#     aug_image = Image.open(os.path.join(img_path,name))
+#     count = 3                           # 每张图片需要增强的数量
+#     for i in range(count):
+#         image = augly_augmentation(aug_image)
+#         image = image.convert("RGB")
+#         image.save(os.path.join(save_path,name[:-4]+"_{}.jpg".format(i)))
+
+def augment_audio(aug_audio):
+    input_audio_arr, sr = validate_and_load_audio(aug_audio)
+    aug = [
+        audaugs.pitch_shift(aug_audio, n_steps=4.0),
+        audaugs.time_stretch(aug_audio,rate=0.5, metadata=[]),
+        audaugs.PeakingEqualizer()(input_audio_arr, sample_rate=sr, metadata=[]),
+        audaugs.Compose([audaugs.AddBackgroundNoise(), audaugs.ToMono(), audaugs.Clicks(),])(input_audio_arr, sample_rate=sr, metadata=[]),
+        
+    ]
+    return random.choice(aug)
+
+def augment_video(aug_video):
+    ## vidgear works on 0.2.4 version 
+    output_path = aug_video.split(".")[-2] + "_output." + aug_video.split(".")[-1]
+    aug = [
+        vidaugs.trim(video_path=aug_video,  output_path=output_path, start=0, end=3),
+        vidaugs.overlay_text(video_path=aug_video, output_path=output_path),
+        vidaugs.loop(video_path=aug_video, output_path=output_path,num_loops=1,metadata=[]),
+        vidaugs.InsertInBackground()(video_path=aug_video, output_path=output_path,metadata=[]),
+        vidaugs.RandomEmojiOverlay()(video_path=aug_video, output_path=output_path,metadata=[]),
+        vidaugs.Compose([vidaugs.AddNoise(),vidaugs.Blur(sigma=5.0),vidaugs.OverlayDots(),])(video_path=aug_video, output_path=output_path)
+    ]
+    return random.choice(aug)

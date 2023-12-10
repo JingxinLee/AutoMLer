@@ -6,11 +6,10 @@ from dotenv import load_dotenv, find_dotenv
 import numpy as np
 from torchvision import transforms
 from transformers import AutoTokenizer
-import augly.text as textaugs
 from PIL import Image
 import torchaudio
 
-from preprocess import infer_data_modality, infer_folder_modality, infer_modality, normalize_text, normalize_image, normalize_audio, normalize_video
+from preprocess import augment_audio, augment_image, augment_text, augment_video, infer_data_modality, infer_folder_modality, infer_modality, normalize_text, normalize_image, normalize_audio, normalize_video
 
 
 _ = load_dotenv(find_dotenv())  # read local .env file
@@ -45,8 +44,8 @@ def text2image(prompt, steps):
     
 
 
-    
-def normalize(modality):
+# Normalize Function  
+def Normalize(modality):
     if modality == "text":
         normalize_function = normalize_text
     if modality == "image":
@@ -61,18 +60,19 @@ def normalize(modality):
 
 
 # Augmentator
-
 def Augmentator(modality):
-    def augment_text(text):
-        aug_text = textaugs.simulate_typos(input_text)
-        return aug_text 
-    
     if modality == 'text':
-        return augment_text(input_text)
+        augment_function = augment_text
+    if modality == 'image':
+        augment_function = augment_image
+    if modality == 'audio':
+        augment_function = augment_audio
+    if modality == 'video':
+        augment_function = augment_video
+    else:
+        raise ValueError("The modality is not supported.")
+    return augment_function
 
-# Define input text
-input_text = "Hello, world! How are you today?"
-input_text
 
 def main():
     path = "/Users/jingxinli/Desktop/Study/顶会/Code/model_constructor/MarkdownFiles"  # 这可以是文件或文件夹的路径
@@ -84,10 +84,10 @@ def main():
     text2image(prompt=text2image_prompt, steps=5)
     
     # 2. Normalize
-    normalize_func = normalize(modality)
+    normalize_func = Normalize(modality)
     
     # 3. Augmentator 
-    Augmentator = 
+    augmentator = Augmentator(modality)
 
     # 4. DataLoader
     dataloader_prompt = f"""
