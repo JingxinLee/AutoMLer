@@ -4,8 +4,9 @@ from langchain.document_loaders import UnstructuredMarkdownLoader
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 import numpy as np
+from ast import literal_eval
 
-from processfiles import (
+from preprocess import (
     process_markdown_batch,
     iterate_folder_files,
     process_files_batch,
@@ -98,16 +99,19 @@ def main():
     4. Task Type: Determine the model's suitability for specific tasks like translation, speech recognition, code generation, etc.
     5. Model Type: Consider the architecture of the model (transformer, CNN, RNN, etc.) and its relevance to the requirements.
 
-    After selecting the most appropriate model based on your knowledge, compare it with the models in `{models}`. If the model you selected is not in `{models}`, explain why it is more suitable than the ones listed.
-
-    Output your findings in JSON format with the following keys: chosen_model, compared_models, query, reason for choice.
-
+    After selecting the most appropriate model based on your knowledge, compare it with the models in `{models}`.
+    
+    DO not give me explanation information. Only Output a list of the models after you selected and compared. eg. ['gpt-3.5-turbo-1106', 'gpt-4-1106-preview']. If there are no models suitable, output an empty list [].
+    
     Query text: ```{query}```
     """
+    #  After selecting the most appropriate model based on your knowledge, compare it with the models in `{models}`. If the model you selected is not in `{models}`, explain why it is more suitable than the ones listed.
+    #  Output your findings in JSON format with the following keys: chosen_model, compared_models, query, reason for choice.
 
     model_select_response = get_completion(model_select_prompt)
-    print(model_select_response)
-
+    print("model_select_response:\n ", model_select_response)
+    model_selected_list = literal_eval(model_select_response)
+    print("model_selected_list: ", model_selected_list)
 
 if __name__ == "__main__":
     main()
