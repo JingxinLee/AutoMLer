@@ -9,7 +9,11 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
+<<<<<<< HEAD
             "python": "/home/ddp/anaconda3/envs/paper/bin/python",
+=======
+            "python": "/home/ddp/anaconda3/envs/paper/bin/python",
+>>>>>>> d1d630e7d0c031142256b41555a4d8a62735e0c4
             "program": "${file}",
             "purpose": [
                 "debug-in-terminal"
