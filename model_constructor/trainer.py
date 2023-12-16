@@ -123,7 +123,7 @@ def Augmentator(modality):
 
 
 def main():
-    ##################  Model Selector  ##################
+    ##################  1. Model Selector  ##################
     all_markdown_files = iterate_folder_files(
         root_directory="MarkdownFiles", markdown_files_to_process=[]
     )
@@ -179,7 +179,7 @@ def main():
     print("model_selected_list: ", model_selected_list)
 
     
-    ###############  Trainer  ###############
+    ###############  2. Trainer  ###############
     most_suitable_model = model_selected_list[0]
     
     file_path = "/home/ddp/nlp/github/paper/mypaper_code/model_constructor/MarkdownFiles"  # 这可以是文件或文件夹的路径
@@ -222,6 +222,7 @@ def main():
         augmentator: ```{augmentator}```
         normalize_func: ```{normalize_func}```
         model: ```{most_suitable_model}```
+        task_choices: ```{task_choices}```
         
     """
     trainer_response = get_completion(trainer_prompt)
