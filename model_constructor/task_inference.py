@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import openml
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
@@ -15,6 +16,11 @@ def get_completion(prompt, model="gpt-3.5-turbo-1106"):
         model=model, messages=messages, temperature=0
     )
     return response.choices[0].message.content
+=======
+import os
+import mimetypes
+
+>>>>>>> 6eccb03a91ffb3420cfa1999ae3f3739124e0a49
 # transformers version v4.36.1
 task_choices = ["AutoModelForCausalLM",
                 "AutoModelForMaskedLM",
@@ -52,6 +58,7 @@ task_choices = ["AutoModelForCausalLM",
                 ]
 
 
+<<<<<<< HEAD
 def openml_task_inference(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
@@ -122,3 +129,52 @@ def openml_task_inference(dataset_name):
 if __name__ == "__main__":
     # openml_task_inference('CIFAR_10')
     openml_task_inference('boston')
+=======
+def infer_task(file_path):
+    # 检测文件类型
+    mime_type, _ = mimetypes.guess_type(file_path)
+    
+    if mime_type is None:
+        return "Unknown file type"
+
+    # 文本文件
+    if mime_type.startswith('text'):
+        return ["AutoModelForCausalLM",
+                "AutoModelForMaskedLM",
+                "AutoModelForMaskGeneration",
+                "AutoModelForSeq2SeqLM",
+                "AutoModelForSequenceClassification",
+                "AutoModelForMultipleChoice",
+                "AutoModelForNextSentencePrediction",
+                "AutoModelForTokenClassification",
+                "AutoModelForQuestionAnswering",
+                "AutoModelForTextEncoding"]
+
+    # 图像文件
+    elif any(mime_type.startswith(t) for t in ['image']):
+        return ["AutoModelForDepthEstimation",
+                "AutoModelForlmageClassification",
+                "AutoModelForVideoClassification",
+                "AutoModelForMaskedImageModeling",
+                "AutoModelForObjectDetection",
+                "AutoModelForlmageSegmentation",
+                "AutoModelForImageTolmage",
+                "AutoModelForSemanticSegmentation",
+                "AutoModelForlnstanceSegmentation",
+                "AutoModelForUniversalSegmentation",
+                "AutoModelForZeroShotlmageClassification",
+                "AutoModelForZeroShotObjectDetection"]
+
+    # 音频文件
+    elif any(mime_type.startswith(t) for t in ['audio']):
+        return ["AutoModelForAudioClassification",
+                "AutoModelForAudioFrameClassification",
+                "AutoModelForCTC",
+                "AutoModelForSpeechSeq2Seq",
+                "AutoModelForAudioXVector",
+                "AutoModelForTextToSpectrogram",
+                "AutoModelForTextToWaveform"]
+
+    else:
+        return "Unsupported file type"
+>>>>>>> 6eccb03a91ffb3420cfa1999ae3f3739124e0a49
