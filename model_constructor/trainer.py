@@ -1,5 +1,4 @@
 import os
-from openai import OpenAI
 from langchain.document_loaders import UnstructuredMarkdownLoader
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
@@ -27,7 +26,7 @@ from preprocess import (augment_audio,
                         process_markdown_batch,
                         iterate_folder_files,
                         process_files_batch)
-
+from task_inference import openml_task_inference
 
 _ = load_dotenv(find_dotenv())  # read local .env file
 client = OpenAI()
