@@ -122,4 +122,4 @@ def openml_task_inference(dataset_name):
 
 if __name__ == "__main__":
     # openml_task_inference('CIFAR_10')
-    openml_task_inference('boston')
+    openml_task_inference('diabetes')
