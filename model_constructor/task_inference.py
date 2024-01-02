@@ -98,23 +98,28 @@ def openml_task_inference(dataset_name):
     most_suitable_model = model_select_response[0]
     # TRAINER
     trainer_prompt = f"""
-        Your task is to generate training code snippet for the task with the model give you. The task and model is enclosed in triple backticks.
+        Your task is to generate training code snippet for the TASK with the MODEL give you. The TASK and MODEL is enclosed in triple backticks.
         You should follow these steps when you write the code snippet:
         1. Import the necessary libraries and modules,such as openml, sklearn, datasets, transformers, Trainer etc.
-        2. Use 'openml.datasets.get_dataset' function to load the dataset using the dataset name I gave you. The dataset name is enclosed in the triple backticks.
+        2. Use 'openml.datasets.get_dataset' function to load the DATASET_NAME I gave you. The DATASET_NAME is enclosed in the triple backticks. for example,get_dataset('CIFAR_10')
         At the end, please return the Trainer code snippet with some usage code snippet.
-        3. Use 'get_data' function to get the data from the dataset. dataset_format="dataframe",target=dataset.default_target_attribute.
+        3. Use 'get_data' function to get the data from the dataset. dataset_format="dataframe",target=dataset.default_target_attribute. Use X and y to store the data.
         4. Split the data into training and testing sets.
-        5. Initialize the model.
-        6. Train the model.
-        7. Make predictions on the testing set.
-        8. Evaluate the model.
-        9. Return the model.
+        5. Convert the data to a CSV file for easy reading by the Hugging Face datasets library. You should follow these steps:
+            5.1 Create a pandas DataFrame train_df use the X_train, append a column to the DataFrame with the column name 'target' and the values of y_train.
+            5.2 Create a pandas DataFrame test_df use the X_test, append a column to the DataFrame with the column name 'target' and the values of y_test.
+            5.3 use to_csv function to generate the csv file.
+            5.4 Load the csv file with the load_dataset function.
+        6. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL.
+        7. Train the model on the train dataset.
+        8. Make predictions on the testing set.
+        9. Evaluate the model.
+        10. Return the model.
         
 
-        model: ```{most_suitable_model}```
-        task: ```{taskInference_response}```
-        dataset: ```{dataset_name}```
+        MODEL: ```{most_suitable_model}```
+        TASK: ```{taskInference_response}```
+        DATASET_NAME: ```{dataset_name}```
         
     """
     trainer_response = get_completion(trainer_prompt)
@@ -122,4 +127,5 @@ def openml_task_inference(dataset_name):
 
 if __name__ == "__main__":
     # openml_task_inference('CIFAR_10')
-    openml_task_inference('diabetes')
+    
+    openml_task_inference('CIFAR_10')
