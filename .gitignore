@@ -1,3 +1,4 @@
 .env
 launch.json
 settings.json
+*.csv

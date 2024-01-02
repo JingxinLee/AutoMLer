@@ -224,6 +224,8 @@ def main():
         task_choices: ```{task_choices}```
         
     """
+    
+    
     trainer_response = get_completion(trainer_prompt)
     print(trainer_response)
 

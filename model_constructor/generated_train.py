@@ -1,5 +1,3 @@
-
-
 # generated snippet Boston 
 # import openml
 # from sklearn.model_selection import train_test_split
@@ -244,17 +242,17 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # 5. Convert the data to a CSV file for easy reading by the Hugging Face datasets library
 # 5.1 Create a pandas DataFrame train_df
-train_df = pd.DataFrame(X_train)
-train_df['target'] = y_train
-# 5.2 Create a pandas DataFrame test_df
-test_df = pd.DataFrame(X_test)
-test_df['target'] = y_test
-# 5.3 use to_csv function to generate the csv file
-train_df.to_csv('train.csv', index=False)
-test_df.to_csv('test.csv', index=False)
+# train_df = pd.DataFrame(X_train)
+# train_df['target'] = y_train
+# # 5.2 Create a pandas DataFrame test_df
+# test_df = pd.DataFrame(X_test)
+# test_df['target'] = y_test
+# # 5.3 use to_csv function to generate the csv file
+# train_df.to_csv('train.csv', index=False)
+# test_df.to_csv('test.csv', index=False)
 # 5.4 Load the csv file with the load_dataset function
-train_dataset = load_dataset('csv', data_files={'train': 'train.csv'})
-test_dataset = load_dataset('csv', data_files={'test': 'test.csv'})
+train_dataset = load_dataset('csv', data_files={'train': 'train.csv'}, split="train")
+test_dataset = load_dataset('csv', data_files={'test': 'test.csv'}, split="test")
 
 # 6. Initialize the MODEL
 model_name = "microsoft/resnet-50"  # Example model
@@ -270,12 +268,13 @@ training_args = TrainingArguments(
     warmup_steps=500,  # number of warmup steps for learning rate scheduler
     weight_decay=0.01,  # strength of weight decay
     logging_dir='./logs',  # directory for storing logs
+    remove_unused_columns=False
 )
 trainer = Trainer(
     model=model,  # the instantiated 🤗 Transformers model to be trained
     args=training_args,  # training arguments, defined above
-    train_dataset=train_dataset['train'],  # training dataset
-    eval_dataset=test_dataset['test']  # evaluation dataset
+    train_dataset=train_dataset,  # training dataset
+    eval_dataset=test_dataset  # evaluation dataset
 )
 trainer.train()
 
