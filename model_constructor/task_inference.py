@@ -108,7 +108,7 @@ def openml_task_inference(dataset_name):
         5. Convert the data to a CSV file for easy reading by the Hugging Face datasets library. You should follow these steps:
             5.1 Create a pandas DataFrame train_df use the X_train, append a column to the DataFrame with the column name 'target' and the values of y_train.
             5.2 Create a pandas DataFrame test_df use the X_test, append a column to the DataFrame with the column name 'target' and the values of y_test.
-            5.3 Use to_csv function to generate the csv file.
+            5.3 use to_csv function to generate the csv file.
             5.4 Load the csv file with the load_dataset function.
         6. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL.
         7. Train the model on the train dataset.
