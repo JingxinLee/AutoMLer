@@ -34,6 +34,8 @@ test_df['target'] = y_test
 train_df.to_csv('train.csv', index=False)
 test_df.to_csv('test.csv', index=False)
 
+# head -n 1000 train.csv > train_sample.csv 
+# head -n 250 test.csv > test_sample.csv
 # 5.4 Load the CSV files with the load_dataset function
 # train_dataset = load_dataset('csv', data_files='train.csv', split='train')
 # test_dataset = load_dataset('csv', data_files='test.csv', split='test')
