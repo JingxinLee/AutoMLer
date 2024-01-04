@@ -1,23 +1,24 @@
-# 1. Import the necessary libraries and modules
+# # 1. Import the necessary libraries and modules
 import openml
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from transformers import Trainer, TrainingArguments
 from datasets import load_dataset
 from transformers import AutoModelForImageClassification, AutoTokenizer
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-# 2. Use 'openml.datasets.get_dataset' function to load the CIFAR_10 dataset
+# # 2. Use 'openml.datasets.get_dataset' function to load the CIFAR_10 dataset
 dataset = openml.datasets.get_dataset('CIFAR_10')
 
-# 3. Use 'get_data' function to get the data from the dataset
+# # 3. Use 'get_data' function to get the data from the dataset
 X, y, _, _ = dataset.get_data(dataset_format="dataframe", target=dataset.default_target_attribute)
 
-# 4. Split the data into training and testing sets
+# # 4. Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 5. Convert the data to a CSV file for easy reading by the Hugging Face datasets library
-# 5.1 Create a pandas DataFrame train_df
-
+# # 5. Convert the data to a CSV file for easy reading by the Hugging Face datasets library
+# # 5.1 Create a pandas DataFrame train_df
 train_df = pd.DataFrame(X_train)
 train_df['target'] = y_train
 # 5.2 Create a pandas DataFrame test_df
@@ -26,9 +27,16 @@ test_df['target'] = y_test
 # 5.3 use to_csv function to generate the csv file
 train_df.to_csv('train.csv', index=False)
 test_df.to_csv('test.csv', index=False)
-# 5.4 Load the csv file with the load_dataset function
+# # 5.4 Load the csv file with the load_dataset function
 train_dataset = load_dataset('csv', data_files={'train': 'train.csv'}, split="train")
 test_dataset = load_dataset('csv', data_files={'test': 'test.csv'}, split="test")
+
+# # Preprocess the dataset 自己的解决方案，行不通
+# def preprocess_function(examples):
+#     return {'pixel_values': [value for key, value in examples.items()]}
+
+# train_dataset = train_dataset.map(preprocess_function)
+# test_dataset = test_dataset.map(preprocess_function)
 
 # 6. Initialize the MODEL
 model_name = "microsoft/resnet-50"  # Example model
@@ -52,6 +60,7 @@ trainer = Trainer(
     train_dataset=train_dataset,  # training dataset
     eval_dataset=test_dataset  # evaluation dataset
 )
+
 trainer.train()
 
 # 8. Make predictions on the testing set
