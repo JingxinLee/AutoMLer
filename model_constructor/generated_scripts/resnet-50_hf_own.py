@@ -50,14 +50,14 @@ test_dataset = load_dataset('csv', data_files={'test': 'test.csv'}, split="test"
 # config = AutoConfig.from_pretrained('microsoft/resnet-50', num_labels=10)
 # model = AutoModelForImageClassification.from_pretrained('microsoft/resnet-50', config=config)
 
-model = AutoModelForImageClassification.from_pretrained(
-    'microsoft/resnet-50',
-    num_labels=10,
-    ignore_mismatched_sizes=True
-)
+# model = AutoModelForImageClassification.from_pretrained(
+#     'microsoft/resnet-50',
+#     num_labels=10,
+#     ignore_mismatched_sizes=True
+# )
 
-# 替换分类器层以匹配你的类别数
-model.classifier = nn.Linear(2048, 10)
+# # 替换分类器层以匹配你的类别数
+# model.classifier = nn.Linear(2048, 10)
 
 # model = AutoModelForImageClassification.from_pretrained('microsoft/resnet-50', num_labels=10)
 # model.classifier = nn.Linear(2048, 10)

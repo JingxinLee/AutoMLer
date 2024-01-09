@@ -174,9 +174,15 @@ def openml_task_inference(dataset_name):
             5.1 Create a pandas DataFrame train_df use the X_train, append a column to the DataFrame with the column name 'target' and the values of y_train.
             5.2 Create a pandas DataFrame test_df use the X_test, append a column to the DataFrame with the column name 'target' and the values of y_test.
             5.3 Use to_csv function to generate the csv file.
-            5.4 Load the csv file with the load_dataset function.
-        6. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL. If the task related to text, use Tokenizer to tokenize the text. If the task related to image classfication, do not use tokenizer but use AutoModelForImageClassification to initialize the model.
-        7. If use openml dataset such as cifar10, create a preprocess function to preprocess the data. For example, you should tranform from 1d array to 3d picture shape. Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. Then save the target numbers to lables such as examples['labels'].  If use other dataset, you can skip this step.
+            5.4 Load the csv file with the load_dataset function. Note the data_files in the load_dataset function should be a dict, the key is the split, and the value is the csv file path.
+        6. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL. If the task related to text, use Tokenizer to tokenize the text. 
+            If the task related to image classfication, do not use tokenizer but use AutoModelForImageClassification to initialize the model. 
+            Use ignore_mismatched_sizes=True when you use AutoModelForImageClassification to initialize the model.
+        7. If use openml dataset such as cifar10, create a preprocess function to preprocess the data. 
+            7.1 Transform all the features number such as a0 a1... a3071 to 3 dimension (3,32,32). Because 3072=3*32*32
+            7.2 Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. 
+            7.3 Then save the target numbers to lables such as examples['labels'].  
+            If use other dataset, you can skip this step.
         8. Train the model on the train dataset.
         9. Make predictions on the testing set.
         10. Evaluate the model.
