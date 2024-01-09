@@ -3,6 +3,8 @@ from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 import os 
 from ast import literal_eval
+from sentence_transformers import SentenceTransformer, util
+import glob
 
 _ = load_dotenv(find_dotenv())  # read local .env file
 client = OpenAI()
@@ -52,7 +54,52 @@ task_choices = ["AutoModelForCausalLM",
                 "AutoModelForVisualQuestionAnswering",
                 "AutoModelForVision2Seq",
                 ]
+def get_markdown_files(path):
+    # 检查路径是否存在
+    if not os.path.exists(path):
+        print("给定的路径不存在。")
+        return []
+    
+    # 构建搜索模式以匹配所有 .md 文件
+    search_pattern = os.path.join(path, '*.md')
+    
+    # 使用 glob.glob() 查找所有匹配的文件路径
+    markdown_files = glob.glob(search_pattern)
+    
+    return markdown_files
 
+def select_model_from_mdfiles(task_description, markdown_files_path):
+    # 加载预训练的模型
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+
+    # 计算任务描述的向量
+    task_vector = model.encode(task_description, convert_to_tensor=True)
+
+    # 假设 markdown_files 是一个包含 Markdown 文件路径的列表
+    markdown_files = get_markdown_files(markdown_files_path)
+
+    # 初始化最高相似度分数和相应的文件内容
+    highest_similarity = -1
+    most_relevant_content = ""
+
+    # 遍历所有 Markdown 文件
+    for file_path in markdown_files:
+        # 读取 Markdown 文件内容
+        with open(file_path, 'r', encoding='utf-8') as file:
+            markdown_content = file.read()
+        
+        # 计算 Markdown 文件内容的向量
+        markdown_vector = model.encode(markdown_content, convert_to_tensor=True)
+        
+        # 计算余弦相似度
+        similarity = util.pytorch_cos_sim(task_vector, markdown_vector)
+        
+        # 更新最高相似度分数和内容
+        if similarity > highest_similarity:
+            highest_similarity = similarity
+            most_relevant_content = markdown_content
+            
+    return most_relevant_content
 
 def openml_task_inference(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)
@@ -80,25 +127,38 @@ def openml_task_inference(dataset_name):
         
     """
     taskInference_response = get_completion(taskInference_prompt)
-    print(taskInference_response)
+    print("taskInference_response:\n ", taskInference_response)
+    print('*'*100)
     
     # MODEL SELECT 
+    # model_select_prompt = f"""
+    # Your task is to identify the most suitable model for the following task, The task is enclosed in triple backticks.
+    # DO not give me explanation information. Only Output a list of the models after you selected and compared. eg. ['microsoft/restnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview']. 
+    # If there are no models suitable, output an empty list [].
+    
+    # task: ```{taskInference_response}```
+    # """
+    #  After selecting the most appropriate model based on your knowledge, compare it with the models in `{models}`. If the model you selected is not in `{models}`, explain why it is more suitable than the ones listed.
+    #  Output your findings in JSON format with the following keys: chosen_model, compared_models, query, reason for choice.
+    markdown_file_contents = select_model_from_mdfiles(taskInference_response, "/home/ddp/nlp/github/paper/mypaper_code/model_constructor/data/MarkdownFiles")
+    print("markdown_file_contents:\n ", markdown_file_contents)
+    print('*'*100)
+    
     model_select_prompt = f"""
     Your task is to identify the most suitable model for the following task, The task is enclosed in triple backticks.
-    DO not give me explanation information. Only Output a list of the models after you selected and compared. eg. ['microsoft/restnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview']. 
+    Additionally, consider the models described in the Markdown files provided. If the most suitable model is found within the Markdown files, return its specific name, such as 'microsoft/resnet-50' or 'microsoft/resnet-18'.
+    Do not give me explanation information. Only output a list of the models after you selected and compared. eg. ['microsoft/resnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview'].
     If there are no models suitable, output an empty list [].
     
     task: ```{taskInference_response}```
+    markdown_files: ```{markdown_file_contents}```
     """
-    #  After selecting the most appropriate model based on your knowledge, compare it with the models in `{models}`. If the model you selected is not in `{models}`, explain why it is more suitable than the ones listed.
-    #  Output your findings in JSON format with the following keys: chosen_model, compared_models, query, reason for choice.
-
     model_select_response = get_completion(model_select_prompt)
     print("model_select_response:\n ", model_select_response)
     model_selected_list = literal_eval(model_select_response)
     most_suitable_model = model_selected_list[0]
     print("most_suitable_model:\n ", most_suitable_model)
-    
+    print('*'*100)
     
     
     # TRAINER which use Hugging Face Model and Trainer
@@ -116,6 +176,7 @@ def openml_task_inference(dataset_name):
             5.3 Use to_csv function to generate the csv file.
             5.4 Load the csv file with the load_dataset function.
         6. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL. If the task related to text, use Tokenizer to tokenize the text. If the task related to image classfication, do not use tokenizer but use AutoModelForImageClassification to initialize the model.
+        7. If use openml dataset such as cifar10, create a preprocess function to preprocess the data. For example, you should tranform from 1d array to 3d picture shape. Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. Then save the target numbers to lables such as examples['labels'].  If use other dataset, you can skip this step.
         8. Train the model on the train dataset.
         9. Make predictions on the testing set.
         10. Evaluate the model.
@@ -128,34 +189,39 @@ def openml_task_inference(dataset_name):
     """
     hf_model_trainer_response = get_completion(hf_model_trainer_prompt, model="gpt-4-1106-preview")
     print("hf_model_trainer_response", hf_model_trainer_response)
+    print('*'*100)
     
-    with open(f'./generated_scripts/{most_suitable_model}_hf.py', 'w') as f:
-        f.write(hf_model_trainer_response)
+    try:
+        with open(f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", 'w') as f:
+            f.write(hf_model_trainer_response)
+    except:
+        with open(f'./generated_scripts/{most_suitable_model}_hf.py', 'w') as f:
+            f.write(hf_model_trainer_response)
     
-    # TRAINER which not use Hugging Face Model and Trainer
-    trainer_prompt = f"""
-        Your task is to generate training code snippet for the task with the model give you. The task and model is enclosed in triple backticks.
-        You should follow these steps when you write the code snippet:
-        1. Import the necessary libraries and modules,such as openml, sklearn, datasets, transformers, Trainer etc.
-        2. Use 'openml.datasets.get_dataset' function to load the dataset using the dataset name I gave you. The dataset name is enclosed in the triple backticks.
-        At the end, please return the Trainer code snippet with some usage code snippet.
-        3. Use 'get_data' function to get the data from the dataset. dataset_format="dataframe",target=dataset.default_target_attribute.
-        4. Split the data into training and testing sets.
-        5. Initialize the model.
-        6. Train the model.
-        7. Make predictions on the testing set.
-        8. Evaluate the model.
+    # # TRAINER which not use Hugging Face Model and Trainer
+    # trainer_prompt = f"""
+    #     Your task is to generate training code snippet for the task with the model give you. The task and model is enclosed in triple backticks.
+    #     You should follow these steps when you write the code snippet:
+    #     1. Import the necessary libraries and modules,such as openml, sklearn, datasets, transformers, Trainer etc.
+    #     2. Use 'openml.datasets.get_dataset' function to load the dataset using the dataset name I gave you. The dataset name is enclosed in the triple backticks.
+    #     At the end, please return the Trainer code snippet with some usage code snippet.
+    #     3. Use 'get_data' function to get the data from the dataset. dataset_format="dataframe",target=dataset.default_target_attribute.
+    #     4. Split the data into training and testing sets.
+    #     5. Initialize the model.
+    #     6. Train the model.
+    #     7. Make predictions on the testing set.
+    #     8. Evaluate the model.
         
 
-        model: ```{most_suitable_model}```
-        task: ```{taskInference_response}```
-        dataset: ```{dataset_name}```
+    #     model: ```{most_suitable_model}```
+    #     task: ```{taskInference_response}```
+    #     dataset: ```{dataset_name}```
         
-    """
-    trainer_response = get_completion(trainer_prompt, model="gpt-4-1106-preview")
-    print(trainer_response)
-    with open(f'./generated_scripts/{most_suitable_model}.py', 'w') as f:
-        f.write(trainer_response)
+    # """
+    # trainer_response = get_completion(trainer_prompt, model="gpt-4-1106-preview")
+    # print(trainer_response)
+    # with open(f'./generated_scripts/{most_suitable_model}.py', 'w') as f:
+    #     f.write(trainer_response)
 
 if __name__ == "__main__":
     # openml_task_inference('CIFAR_10')
