@@ -3,3 +3,4 @@ launch.json
 settings.json
 *.csv
 *.pyc
+model_constructor/generated_scripts/results
