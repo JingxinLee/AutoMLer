@@ -1,7 +1,7 @@
 import openml
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
-import os 
+import os
 from ast import literal_eval
 from sentence_transformers import SentenceTransformer, util
 import glob
@@ -19,58 +19,63 @@ def get_completion(prompt, model="gpt-3.5-turbo-1106"):
     )
     return response.choices[0].message.content
 
+
 # transformers version v4.36.1
-task_choices = ["AutoModelForCausalLM",
-                "AutoModelForMaskedLM",
-                "AutoModelForMaskGeneration",
-                "AutoModelForSeq2SeqLM",
-                "AutoModelForSequenceClassification",
-                "AutoModelForMultipleChoice",
-                "AutoModelForNextSentencePrediction",
-                "AutoModelForTokenClassification",
-                "AutoModelForQuestionAnswering",
-                "AutoModelForTextEncoding",
-                "AutoModelForDepthEstimation",
-                "AutoModelForlmageClassification",
-                "AutoModelForVideoClassification",
-                "AutoModelForMaskedImageModeling",
-                "AutoModelForObjectDetection",
-                "AutoModelForlmageSegmentation",
-                "AutoModelForImageTolmage",
-                "AutoModelForSemanticSegmentation",
-                "AutoModelForlnstanceSegmentation",
-                "AutoModelForUniversalSegmentation",
-                "AutoModelForZeroShotlmageClassification",
-                "AutoModelForZeroShotObjectDetection",
-                "AutoModelForAudioClassification",
-                "AutoModelForAudioFrameClassification",
-                "AutoModelForCTC",
-                "AutoModelForSpeechSeq2Seq",
-                "AutoModelForAudioXVector",
-                "AutoModelForTextToSpectrogram",
-                "AutoModelForTextToWaveform",
-                "AutoModelForTableQuestionAnswering",
-                "AutoModelForDocumentQuestionAnswering",
-                "AutoModelForVisualQuestionAnswering",
-                "AutoModelForVision2Seq",
-                ]
+task_choices = [
+    "AutoModelForCausalLM",
+    "AutoModelForMaskedLM",
+    "AutoModelForMaskGeneration",
+    "AutoModelForSeq2SeqLM",
+    "AutoModelForSequenceClassification",
+    "AutoModelForMultipleChoice",
+    "AutoModelForNextSentencePrediction",
+    "AutoModelForTokenClassification",
+    "AutoModelForQuestionAnswering",
+    "AutoModelForTextEncoding",
+    "AutoModelForDepthEstimation",
+    "AutoModelForlmageClassification",
+    "AutoModelForVideoClassification",
+    "AutoModelForMaskedImageModeling",
+    "AutoModelForObjectDetection",
+    "AutoModelForlmageSegmentation",
+    "AutoModelForImageTolmage",
+    "AutoModelForSemanticSegmentation",
+    "AutoModelForlnstanceSegmentation",
+    "AutoModelForUniversalSegmentation",
+    "AutoModelForZeroShotlmageClassification",
+    "AutoModelForZeroShotObjectDetection",
+    "AutoModelForAudioClassification",
+    "AutoModelForAudioFrameClassification",
+    "AutoModelForCTC",
+    "AutoModelForSpeechSeq2Seq",
+    "AutoModelForAudioXVector",
+    "AutoModelForTextToSpectrogram",
+    "AutoModelForTextToWaveform",
+    "AutoModelForTableQuestionAnswering",
+    "AutoModelForDocumentQuestionAnswering",
+    "AutoModelForVisualQuestionAnswering",
+    "AutoModelForVision2Seq",
+]
+
+
 def get_markdown_files(path):
     # 检查路径是否存在
     if not os.path.exists(path):
         print("给定的路径不存在。")
         return []
-    
+
     # 构建搜索模式以匹配所有 .md 文件
-    search_pattern = os.path.join(path, '*.md')
-    
+    search_pattern = os.path.join(path, "*.md")
+
     # 使用 glob.glob() 查找所有匹配的文件路径
     markdown_files = glob.glob(search_pattern)
-    
+
     return markdown_files
+
 
 def select_model_from_mdfiles(task_description, markdown_files_path):
     # 加载预训练的模型
-    model = SentenceTransformer('all-MiniLM-L6-v2')
+    model = SentenceTransformer("all-MiniLM-L6-v2")
 
     # 计算任务描述的向量
     task_vector = model.encode(task_description, convert_to_tensor=True)
@@ -85,21 +90,22 @@ def select_model_from_mdfiles(task_description, markdown_files_path):
     # 遍历所有 Markdown 文件
     for file_path in markdown_files:
         # 读取 Markdown 文件内容
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             markdown_content = file.read()
-        
+
         # 计算 Markdown 文件内容的向量
         markdown_vector = model.encode(markdown_content, convert_to_tensor=True)
-        
+
         # 计算余弦相似度
         similarity = util.pytorch_cos_sim(task_vector, markdown_vector)
-        
+
         # 更新最高相似度分数和内容
         if similarity > highest_similarity:
             highest_similarity = similarity
             most_relevant_content = markdown_content
-            
+
     return most_relevant_content
+
 
 def openml_task_inference(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)
@@ -110,7 +116,7 @@ def openml_task_inference(dataset_name):
     X_head = X.head()
     y_head = y.head()
     # print("X_head\n", X_head)
-    # print("y_head\n", y_head)    
+    # print("y_head\n", y_head)
     # TASK INFERENCE
     taskInference_prompt = f"""
         Your task is to infer the task based on the training data, X_head is the features and y_head is the labels. 
@@ -128,22 +134,25 @@ def openml_task_inference(dataset_name):
     """
     taskInference_response = get_completion(taskInference_prompt)
     print("taskInference_response:\n ", taskInference_response)
-    print('*'*100)
-    
-    # MODEL SELECT 
+    print("*" * 100)
+
+    # MODEL SELECT
     # model_select_prompt = f"""
     # Your task is to identify the most suitable model for the following task, The task is enclosed in triple backticks.
-    # DO not give me explanation information. Only Output a list of the models after you selected and compared. eg. ['microsoft/restnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview']. 
+    # DO not give me explanation information. Only Output a list of the models after you selected and compared. eg. ['microsoft/restnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview'].
     # If there are no models suitable, output an empty list [].
-    
+
     # task: ```{taskInference_response}```
     # """
     #  After selecting the most appropriate model based on your knowledge, compare it with the models in `{models}`. If the model you selected is not in `{models}`, explain why it is more suitable than the ones listed.
     #  Output your findings in JSON format with the following keys: chosen_model, compared_models, query, reason for choice.
-    markdown_file_contents = select_model_from_mdfiles(taskInference_response, "/home/ddp/nlp/github/paper/mypaper_code/model_constructor/data/MarkdownFiles")
+    markdown_file_contents = select_model_from_mdfiles(
+        taskInference_response,
+        "/home/ddp/nlp/github/paper/mypaper_code/model_constructor/data/MarkdownFiles",
+    )
     print("markdown_file_contents:\n ", markdown_file_contents)
-    print('*'*100)
-    
+    print("*" * 100)
+
     model_select_prompt = f"""
     Your task is to identify the most suitable model for the following task, The task is enclosed in triple backticks.
     Additionally, consider the models described in the Markdown files provided. If the most suitable model is found within the Markdown files, return its specific name, such as 'microsoft/resnet-50' or 'microsoft/resnet-18'.
@@ -158,9 +167,8 @@ def openml_task_inference(dataset_name):
     model_selected_list = literal_eval(model_select_response)
     most_suitable_model = model_selected_list[0]
     print("most_suitable_model:\n ", most_suitable_model)
-    print('*'*100)
-    
-    
+    print("*" * 100)
+
     # TRAINER which use Hugging Face Model and Trainer
     hf_model_trainer_prompt = f"""
         Your task is to generate training code snippet for the TASK with the MODEL give you. The TASK and MODEL is enclosed in triple backticks.
@@ -193,17 +201,21 @@ def openml_task_inference(dataset_name):
         DATASET_NAME: ```{dataset_name}```
         
     """
-    hf_model_trainer_response = get_completion(hf_model_trainer_prompt, model="gpt-4-1106-preview")
+    hf_model_trainer_response = get_completion(
+        hf_model_trainer_prompt, model="gpt-4-1106-preview"
+    )
     print("hf_model_trainer_response", hf_model_trainer_response)
-    print('*'*100)
-    
+    print("*" * 100)
+
     try:
-        with open(f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", 'w') as f:
+        with open(
+            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", "w"
+        ) as f:
             f.write(hf_model_trainer_response)
     except:
-        with open(f'./generated_scripts/{most_suitable_model}_hf.py', 'w') as f:
+        with open(f"./generated_scripts/{most_suitable_model}_hf.py", "w") as f:
             f.write(hf_model_trainer_response)
-    
+
     # # TRAINER which not use Hugging Face Model and Trainer
     # trainer_prompt = f"""
     #     Your task is to generate training code snippet for the task with the model give you. The task and model is enclosed in triple backticks.
@@ -217,19 +229,19 @@ def openml_task_inference(dataset_name):
     #     6. Train the model.
     #     7. Make predictions on the testing set.
     #     8. Evaluate the model.
-        
 
     #     model: ```{most_suitable_model}```
     #     task: ```{taskInference_response}```
     #     dataset: ```{dataset_name}```
-        
+
     # """
     # trainer_response = get_completion(trainer_prompt, model="gpt-4-1106-preview")
     # print(trainer_response)
     # with open(f'./generated_scripts/{most_suitable_model}.py', 'w') as f:
     #     f.write(trainer_response)
 
+
 if __name__ == "__main__":
     # openml_task_inference('CIFAR_10')
-    
-    openml_task_inference('CIFAR_10')
+
+    openml_task_inference("CIFAR_10")
