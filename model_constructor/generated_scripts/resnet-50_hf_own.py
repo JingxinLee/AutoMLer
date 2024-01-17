@@ -43,8 +43,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # 5.4 Load the CSV files with the load_dataset function
 # train_dataset = load_dataset('csv', data_files='train.csv', split='train')
 # test_dataset = load_dataset('csv', data_files='test.csv', split='test')
-train_dataset = load_dataset('csv', data_files={'train': 'train.csv'}, split="train")
-test_dataset = load_dataset('csv', data_files={'test': 'test.csv'}, split="test")
+train_dataset = load_dataset('csv', data_files={'train': 'train_data_sample.csv'}, split="train")
+test_dataset = load_dataset('csv', data_files={'test': 'test_data_sample.csv'}, split="test")
 
 # 6. Initialize the ResNet-50 model
 # config = AutoConfig.from_pretrained('microsoft/resnet-50', num_labels=10)
