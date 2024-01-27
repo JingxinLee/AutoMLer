@@ -170,6 +170,10 @@ def openml_task_inference(dataset_name):
     print("*" * 100)
 
     # TRAINER which use Hugging Face Model and Trainer
+    # 切成2段，分段执行
+    # 第7个单独拎出来
+    # Prompt按照markdown语法来写 加粗 few shot learning写法：举例子 openml dimension check——》transform
+    #  7 general assert检查dimension  --》 Warning
     hf_model_trainer_prompt = f"""
         Your task is to generate training code snippet for the TASK with the MODEL give you. The TASK and MODEL is enclosed in triple backticks.
         You should follow these steps when you write the code snippet:
