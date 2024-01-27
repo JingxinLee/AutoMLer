@@ -192,6 +192,7 @@ def openml_task_inference(dataset_name):
             Use ignore_mismatched_sizes=True when you use AutoModelForImageClassification to initialize the model.
         7. If use openml dataset such as cifar10, create a preprocess function to preprocess the data. 
             7.1 Transform all the features number such as a0 a1... a3071 to 3 dimension (3,32,32). Because 3072=3*32*32
+                Example code: images = [torch.Tensor(list(img)).view(3, 32, 32) for img in zip(*(examples['a'+str(i)] for i in range(3072)))]
             7.2 Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. 
             7.3 Then save the target numbers to lables such as examples['labels'].  
             If use other dataset, you can skip this step.
@@ -213,11 +214,11 @@ def openml_task_inference(dataset_name):
 
     try:
         with open(
-            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", "w"
+            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf2.py", "w"
         ) as f:
             f.write(hf_model_trainer_response)
     except:
-        with open(f"./generated_scripts/{most_suitable_model}_hf.py", "w") as f:
+        with open(f"./generated_scripts/{most_suitable_model}_hf2.py", "w") as f:
             f.write(hf_model_trainer_response)
 
     # # TRAINER which not use Hugging Face Model and Trainer
