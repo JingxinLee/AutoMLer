@@ -5,6 +5,8 @@ import pandas as pd
 from datasets import load_dataset
 from transformers import AutoModelForImageClassification, TrainingArguments, Trainer
 import torch
+import numpy as np
+from augly.image import aug_np_wrapper, overlay_emoji
 
 # 2. Load the dataset from OpenML
 dataset = openml.datasets.get_dataset("CIFAR_10")
@@ -52,9 +54,28 @@ def preprocess_data(examples):
     examples["labels"] = examples["target"]
     return examples
 
+def preprocess_aug_data(examples):
+    augmented_images = [
+        aug_np_wrapper(
+            np.array(img, dtype=np.uint8).reshape((3, 1024)),  # 注意这里要指定dtype=np.uint8, 否则会报错
+            overlay_emoji, 
+            **{'opacity': 0.5, 'y_pos': 0.45}
+        )
+        for img in zip(*(examples[f"a{i}"] for i in range(3072)))
+    ]
+
+    images = [
+        torch.Tensor(list(aug_img)).view(3, 32, 32)
+        for aug_img in augmented_images
+    ]
+
+    examples["pixel_values"] = images
+    examples["labels"] = examples["target"]
+
+    return examples
 
 # Apply the preprocess function to the datasets
-datasets = datasets.map(preprocess_data, batched=True)
+datasets = datasets.map(preprocess_aug_data, batched=True)
 
 # 8. Train the model on the train dataset
 training_args = TrainingArguments(
