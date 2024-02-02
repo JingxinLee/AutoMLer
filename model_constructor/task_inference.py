@@ -191,7 +191,9 @@ def openml_task_inference(dataset_name):
             If the task related to image classfication, do not use tokenizer but use AutoModelForImageClassification to initialize the model. 
             Use ignore_mismatched_sizes=True when you use AutoModelForImageClassification to initialize the model.
         7. If use openml dataset such as cifar10, create a preprocess function to preprocess the data. 
-            7.1 Transform all the features number such as a0 a1... a3071 to 3 dimension (3,32,32). Because 3072=3*32*32
+            7.1 Use Augly Aument the data if necessary. For example, you can use aug_np_wrapper to augment the images. 
+                Example code: from augly.image import aug_np_wrapper, overlay_emoji  augmented_images = [aug_np_wrapper(np.array(img, dtype=np.uint8).reshape((3, 1024)), overlay_emoji,opacity=0.5, y_pos=0.45) for img in zip(*(examples["a" + str(i)] for i in range(3072)))]
+            7.1 Transform all the features number such as a0 a1... a3071 to 3 dimension (3,x,x), the first dimension is 3, the second and third dimension is x which use sqrt(number of features/3) to calculate.
                 Example code: images = [torch.Tensor(list(img)).view(3, 32, 32) for img in zip(*(examples['a'+str(i)] for i in range(3072)))]
             7.2 Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. 
             7.3 Then save the target numbers to lables such as examples['labels'].  
