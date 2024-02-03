@@ -12,7 +12,7 @@ OpenAI.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # model = "gpt-3.5-turbo-1106" or "gpt-4-1106-preview"
-def get_completion(prompt, model="gpt-3.5-turbo-1106"):
+def get_completion(prompt, model="gpt-3.5-turbo-0125"):
     messages = [{"role": "user", "content": prompt}]
     response = client.chat.completions.create(
         model=model, messages=messages, temperature=0
@@ -148,7 +148,7 @@ def openml_task_inference(dataset_name):
     #  Output your findings in JSON format with the following keys: chosen_model, compared_models, query, reason for choice.
     markdown_file_contents = select_model_from_mdfiles(
         taskInference_response,
-        "/home/ddp/nlp/github/paper/mypaper_code/model_constructor/data/MarkdownFiles",
+        "/root/paper/mypaper_code/model_constructor/data/MarkdownFiles",
     )
     print("markdown_file_contents:\n ", markdown_file_contents)
     print("*" * 100)
@@ -198,7 +198,8 @@ def openml_task_inference(dataset_name):
             7.2 Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. 
             7.3 Then save the target numbers to lables such as examples['labels'].  
             If use other dataset, you can skip this step.
-        8. Train the model on the train dataset.
+        8. Train the model on the train dataset. You must provide the most suitable optimizers in Trainer. The optimizers(`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple
+            containing the optimizer and the scheduler to use. If not provided, a default optimizer and scheduler will be created using the model's configuration.
         9. Make predictions on the testing set.
         10. Evaluate the model.
         
@@ -209,7 +210,7 @@ def openml_task_inference(dataset_name):
         
     """
     hf_model_trainer_response = get_completion(
-        hf_model_trainer_prompt, model="gpt-4-1106-preview"
+        hf_model_trainer_prompt, model="gpt-4-0125-preview"
     )
     print("hf_model_trainer_response", hf_model_trainer_response)
     print("*" * 100)
