@@ -199,7 +199,8 @@ def openml_task_inference(dataset_name):
             7.3 Then save the target numbers to lables such as examples['labels'].  
             If use other dataset, you can skip this step.
         8. Train the model on the train dataset. You must provide the most suitable optimizers in Trainer. The optimizers(`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple
-            containing the optimizer and the scheduler to use. If not provided, a default optimizer and scheduler will be created using the model's configuration.
+            containing the optimizer and the scheduler to use. 
+            Example code: trainer = Trainer(..., optimizers=(torch.optim.AdamW(model.parameters(), lr=1e-5), torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 1 / (1 + decay * epoch))))
         9. Make predictions on the testing set.
         10. Evaluate the model.
         
@@ -209,6 +210,7 @@ def openml_task_inference(dataset_name):
         DATASET_NAME: ```{dataset_name}```
         
     """
+    # If not provided, a default optimizer and scheduler will be created using the model's configuration.
     hf_model_trainer_response = get_completion(
         hf_model_trainer_prompt, model="gpt-4-0125-preview"
     )
