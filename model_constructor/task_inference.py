@@ -198,9 +198,13 @@ def openml_task_inference(dataset_name):
             7.2 Then save them to a parameter that the model requires. For example you can save it to examples['pixel_values']. 
             7.3 Then save the target numbers to lables such as examples['labels'].  
             If use other dataset, you can skip this step.
-        8. Train the model on the train dataset. You must provide the most suitable optimizers in Trainer. The optimizers(`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple
-            containing the optimizer and the scheduler to use. 
-            Example code: trainer = Trainer(..., optimizers=(torch.optim.AdamW(model.parameters(), lr=1e-5), torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 1 / (1 + decay * epoch))))
+        8. Define optimizers. The optimizers(`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple containing the optimizer and the scheduler to use. 
+           First define opimizer, then define scheduler. Choose the most suitable opimizer and scheduler for the model and task. 
+            Example code: optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5) 
+                          scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 1 / (1 + decay * epoch))
+                          opimizers = (opimizer, scheduler)
+        8. Train the model on the train dataset. You must provide the optimizers which you defined before in Trainer.
+            Example code: trainer = Trainer(..., opimizers=opimizers) 
         9. Make predictions on the testing set.
         10. Evaluate the model.
         
