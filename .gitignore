@@ -7,3 +7,11 @@ model_constructor/generated_scripts/results
 automl/AutogluonModels
 automl/image_classifier
 *.h5
+*.pb
+checkpoint.*
+*.json
+pipeline
+checkpoint
+graph
+best_pipeline
+variables.*
