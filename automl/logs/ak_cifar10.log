@@ -1,0 +1,207 @@
+(paper) (base)  ddp@dell-Precision-7920-Tower-0  ~/nlp/github/paper/mypaper_code/automl  ↰ main  /home/ddp/anaconda3/envs/automl/bin/python /home/ddp/nlp/github/paper/mypaper_code/automl/ak_cifar10.py
+2024-02-21 15:47:31.486245: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-02-21 15:47:31.557121: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2024-02-21 15:47:31.557171: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2024-02-21 15:47:31.558368: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-02-21 15:47:31.565305: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-02-21 15:47:32.454902: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Using TensorFlow backend
+Downloading data from https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
+170498071/170498071 [==============================] - 87s 1us/step
+(50000, 32, 32, 3)
+(1000, 32, 32, 3)
+(1000, 1)
+2024-02-21 15:49:15.042898: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22031 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 3090, pci bus id: 0000:73:00.0, compute capability: 8.6
+2024-02-21 15:49:15.044175: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22424 MB memory:  -> device: 1, name: NVIDIA GeForce RTX 3090, pci bus id: 0000:d5:00.0, compute capability: 8.6
+
+Search: Running Trial #1
+
+Value             |Best Value So Far |Hyperparameter
+vanilla           |vanilla           |image_block_1/block_type
+True              |True              |image_block_1/normalize
+False             |False             |image_block_1/augment
+3                 |3                 |image_block_1/conv_block_1/kernel_size
+1                 |1                 |image_block_1/conv_block_1/num_blocks
+2                 |2                 |image_block_1/conv_block_1/num_layers
+True              |True              |image_block_1/conv_block_1/max_pooling
+False             |False             |image_block_1/conv_block_1/separable
+0.25              |0.25              |image_block_1/conv_block_1/dropout
+32                |32                |image_block_1/conv_block_1/filters_0_0
+64                |64                |image_block_1/conv_block_1/filters_0_1
+flatten           |flatten           |classification_head_1/spatial_reduction_1/reduction_type
+0.5               |0.5               |classification_head_1/dropout
+adam              |adam              |optimizer
+0.001             |0.001             |learning_rate
+
+2024-02-21 15:49:19.973451: E tensorflow/core/grappler/optimizers/meta_optimizer.cc:961] layout failed: INVALID_ARGUMENT: Size of values 0 does not match size of permutation 4 @ fanin shape inmodel/dropout/dropout/SelectV2-2-TransposeNHWCToNCHW-LayoutOptimizer
+2024-02-21 15:49:20.776554: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8900
+2024-02-21 15:49:22.405369: I external/local_xla/xla/service/service.cc:168] XLA service 0x7f88f0f6ecc0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2024-02-21 15:49:22.405417: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA GeForce RTX 3090, Compute Capability 8.6
+2024-02-21 15:49:22.405429: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (1): NVIDIA GeForce RTX 3090, Compute Capability 8.6
+2024-02-21 15:49:22.411161: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1708501762.568511 3465020 device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+26/26 [==============================] - 5s 23ms/step - loss: 2.2773 - accuracy: 0.1683 - val_loss: 2.1080 - val_accuracy: 0.2619
+
+Trial 1 Complete [00h 00m 07s]
+val_loss: 2.107991933822632
+
+Best val_loss So Far: 2.107991933822632
+Total elapsed time: 00h 00m 07s
+
+Search: Running Trial #2
+
+Value             |Best Value So Far |Hyperparameter
+resnet            |vanilla           |image_block_1/block_type
+True              |True              |image_block_1/normalize
+True              |False             |image_block_1/augment
+True              |None              |image_block_1/image_augmentation_1/horizontal_flip
+True              |None              |image_block_1/image_augmentation_1/vertical_flip
+0                 |None              |image_block_1/image_augmentation_1/contrast_factor
+0                 |None              |image_block_1/image_augmentation_1/rotation_factor
+0.1               |None              |image_block_1/image_augmentation_1/translation_factor
+0                 |None              |image_block_1/image_augmentation_1/zoom_factor
+False             |None              |image_block_1/res_net_block_1/pretrained
+resnet50          |None              |image_block_1/res_net_block_1/version
+True              |None              |image_block_1/res_net_block_1/imagenet_size
+global_avg        |flatten           |classification_head_1/spatial_reduction_1/reduction_type
+0                 |0.5               |classification_head_1/dropout
+adam              |adam              |optimizer
+0.001             |0.001             |learning_rate
+
+26/26 [==============================] - 42s 233ms/step - loss: 3.4473 - accuracy: 0.1334 - val_loss: 2.5955 - val_accuracy: 0.1310
+
+Trial 2 Complete [00h 00m 44s]
+val_loss: 2.595459461212158
+
+Best val_loss So Far: 2.107991933822632
+Total elapsed time: 00h 00m 51s
+
+Search: Running Trial #3
+
+Value             |Best Value So Far |Hyperparameter
+efficient         |vanilla           |image_block_1/block_type
+True              |True              |image_block_1/normalize
+True              |False             |image_block_1/augment
+True              |None              |image_block_1/image_augmentation_1/horizontal_flip
+False             |None              |image_block_1/image_augmentation_1/vertical_flip
+0                 |None              |image_block_1/image_augmentation_1/contrast_factor
+0                 |None              |image_block_1/image_augmentation_1/rotation_factor
+0.1               |None              |image_block_1/image_augmentation_1/translation_factor
+0                 |None              |image_block_1/image_augmentation_1/zoom_factor
+True              |None              |image_block_1/efficient_net_block_1/pretrained
+b7                |None              |image_block_1/efficient_net_block_1/version
+True              |None              |image_block_1/efficient_net_block_1/trainable
+True              |None              |image_block_1/efficient_net_block_1/imagenet_size
+global_avg        |flatten           |classification_head_1/spatial_reduction_1/reduction_type
+0                 |0.5               |classification_head_1/dropout
+adam              |adam              |optimizer
+2e-05             |0.001             |learning_rate
+
+Downloading data from https://storage.googleapis.com/keras-applications/efficientnetb7_notop.h5
+258076736/258076736 [==============================] - 132s 1us/step
+2024-02-21 15:53:25.490304: E tensorflow/core/grappler/optimizers/meta_optimizer.cc:961] layout failed: INVALID_ARGUMENT: Size of values 0 does not match size of permutation 4 @ fanin shape inmodel/efficientnetb7/block1b_drop/dropout/SelectV2-2-TransposeNHWCToNCHW-LayoutOptimizer
+26/26 [==============================] - 141s 828ms/step - loss: 2.2618 - accuracy: 0.1550 - val_loss: 2.3913 - val_accuracy: 0.1012
+
+Trial 3 Complete [00h 04m 44s]
+val_loss: 2.3912882804870605
+
+Best val_loss So Far: 2.107991933822632
+Total elapsed time: 00h 05m 35s
+
+Search: Running Trial #4
+
+Value             |Best Value So Far |Hyperparameter
+True              |True              |image_block_1/normalize
+False             |False             |image_block_1/augment
+vanilla           |vanilla           |image_block_1/block_type
+flatten           |flatten           |classification_head_1/spatial_reduction_1/reduction_type
+0.5               |0.5               |classification_head_1/dropout
+adam              |adam              |optimizer
+0.001             |0.001             |learning_rate
+5                 |3                 |image_block_1/conv_block_1/kernel_size
+False             |False             |image_block_1/conv_block_1/separable
+True              |True              |image_block_1/conv_block_1/max_pooling
+1                 |1                 |image_block_1/conv_block_1/num_blocks
+2                 |2                 |image_block_1/conv_block_1/num_layers
+32                |32                |image_block_1/conv_block_1/filters_0_0
+64                |64                |image_block_1/conv_block_1/filters_0_1
+0.25              |0.25              |image_block_1/conv_block_1/dropout
+
+2024-02-21 15:54:54.592028: E tensorflow/core/grappler/optimizers/meta_optimizer.cc:961] layout failed: INVALID_ARGUMENT: Size of values 0 does not match size of permutation 4 @ fanin shape inmodel/dropout/dropout/SelectV2-2-TransposeNHWCToNCHW-LayoutOptimizer
+26/26 [==============================] - 2s 21ms/step - loss: 2.2964 - accuracy: 0.1154 - val_loss: 2.1854 - val_accuracy: 0.2143
+
+Trial 4 Complete [00h 00m 04s]
+val_loss: 2.185368776321411
+
+Best val_loss So Far: 2.107991933822632
+Total elapsed time: 00h 05m 38s
+
+Search: Running Trial #5
+
+Value             |Best Value So Far |Hyperparameter
+True              |True              |image_block_1/normalize
+False             |False             |image_block_1/augment
+vanilla           |vanilla           |image_block_1/block_type
+flatten           |flatten           |classification_head_1/spatial_reduction_1/reduction_type
+0.5               |0.5               |classification_head_1/dropout
+adam              |adam              |optimizer
+0.001             |0.001             |learning_rate
+3                 |3                 |image_block_1/conv_block_1/kernel_size
+False             |False             |image_block_1/conv_block_1/separable
+True              |True              |image_block_1/conv_block_1/max_pooling
+3                 |1                 |image_block_1/conv_block_1/num_blocks
+2                 |2                 |image_block_1/conv_block_1/num_layers
+32                |32                |image_block_1/conv_block_1/filters_0_0
+64                |64                |image_block_1/conv_block_1/filters_0_1
+0.25              |0.25              |image_block_1/conv_block_1/dropout
+
+26/26 [==============================] - 3s 27ms/step - loss: 2.3050 - accuracy: 0.1046 - val_loss: 2.3099 - val_accuracy: 0.0774
+
+Trial 5 Complete [00h 00m 04s]
+val_loss: 2.3099277019500732
+
+Best val_loss So Far: 2.107991933822632
+Total elapsed time: 00h 05m 43s
+32/32 [==============================] - 1s 12ms/step - loss: 2.2577 - accuracy: 0.1750
+1532/1532 [==============================] - 8s 4ms/step - loss: 2.0949 - accuracy: 0.2565
+Accuracy =  25.646939873695374 %
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 32, 32, 3)]       0         
+                                                                 
+ cast_to_float32 (CastToFlo  (None, 32, 32, 3)         0         
+ at32)                                                           
+                                                                 
+ normalization (Normalizati  (None, 32, 32, 3)         7         
+ on)                                                             
+                                                                 
+ conv2d (Conv2D)             (None, 30, 30, 32)        896       
+                                                                 
+ conv2d_1 (Conv2D)           (None, 28, 28, 64)        18496     
+                                                                 
+ max_pooling2d (MaxPooling2  (None, 14, 14, 64)        0         
+ D)                                                              
+                                                                 
+ dropout (Dropout)           (None, 14, 14, 64)        0         
+                                                                 
+ flatten (Flatten)           (None, 12544)             0         
+                                                                 
+ dropout_1 (Dropout)         (None, 12544)             0         
+                                                                 
+ dense (Dense)               (None, 10)                125450    
+                                                                 
+ classification_head_1 (Sof  (None, 10)                0         
+ tmax)                                                           
+                                                                 
+=================================================================
+Total params: 144849 (565.82 KB)
+Trainable params: 144842 (565.79 KB)
+Non-trainable params: 7 (32.00 Byte)
+_________________________________________________________________
+None
+/home/ddp/anaconda3/envs/automl/lib/python3.10/site-packages/keras/src/engine/training.py:3103: UserWarning: You are saving your model as an HDF5 file via `model.save()`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')`.
+  saving_api.save_model(

@@ -4,3 +4,6 @@ settings.json
 *.csv
 *.pyc
 model_constructor/generated_scripts/results
+automl/AutogluonModels
+automl/image_classifier
+*.h5
