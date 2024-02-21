@@ -22,3 +22,135 @@ Name: target, dtype: float64
 4    8
 Name: target, dtype: int64
 {'accuracy': 0.39357429718875503, 'balanced_accuracy': 0.3858773181327529, 'mcc': 0.32627264604441025}
+
+(automl)  ddp@dell-Precision-7920-Tower-0  ~/nlp/github/paper/mypaper_code/automl  ↰ main  python ag_cifar10.py > logs/ag_cifar10.log
+No path specified. Models will be saved in: "AutogluonModels/ag-20240221_081552"
+No presets specified! To achieve strong results with AutoGluon, it is recommended to use the available presets.
+        Recommended Presets (For more details refer to https://auto.gluon.ai/stable/tutorials/tabular/tabular-essentials.html#presets):
+        presets='best_quality'   : Maximize accuracy. Default time_limit=3600.
+        presets='high_quality'   : Strong accuracy with fast inference speed. Default time_limit=3600.
+        presets='good_quality'   : Good accuracy with very fast inference speed. Default time_limit=3600.
+        presets='medium_quality' : Fast training time, ideal for initial prototyping.
+Beginning AutoGluon training ...
+AutoGluon will save models to "AutogluonModels/ag-20240221_081552"
+=================== System Info ===================
+AutoGluon Version:  1.0.0
+Python Version:     3.10.13
+Operating System:   Linux
+Platform Machine:   x86_64
+Platform Version:   #63~20.04.1-Ubuntu SMP Wed Nov 30 13:40:16 UTC 2022
+CPU Count:          40
+Memory Avail:       73.09 GB / 125.55 GB (58.2%)
+Disk Space Avail:   0.78 GB / 915.32 GB (0.1%)
+        WARNING: Available disk space is low and there is a risk that AutoGluon will run out of disk during fit, causing an exception.
+        We recommend a minimum available disk space of 10 GB, and large datasets may require more.
+===================================================
+Train Data Rows:    999
+Train Data Columns: 3072
+Label Column:       target
+AutoGluon infers your prediction problem is: 'multiclass' (because dtype of label-column == int, but few unique label-values observed).
+        10 unique label values:  [7, 1, 5, 2, 0, 3, 6, 4, 8, 9]
+        If 'multiclass' is not the correct problem_type, please manually specify the problem_type parameter during predictor init (You may specify problem_type as one of: ['binary', 'multiclass', 'regression'])
+Problem Type:       multiclass
+Preprocessing data ...
+Train Data Class Count: 10
+Using Feature Generators to preprocess the data ...
+Fitting AutoMLPipelineFeatureGenerator...
+        Available Memory:                    74836.02 MB
+        Train Data (Original)  Memory Usage: 23.41 MB (0.0% of available memory)
+        Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+        Stage 1 Generators:
+                Fitting AsTypeFeatureGenerator...
+        Stage 2 Generators:
+                Fitting FillNaFeatureGenerator...
+        Stage 3 Generators:
+                Fitting IdentityFeatureGenerator...
+        Stage 4 Generators:
+                Fitting DropUniqueFeatureGenerator...
+        Stage 5 Generators:
+                Fitting DropDuplicatesFeatureGenerator...
+        Types of features in original data (raw dtype, special dtypes):
+                ('int', []) : 3072 | ['a0', 'a1', 'a2', 'a3', 'a4', ...]
+        Types of features in processed data (raw dtype, special dtypes):
+                ('int', []) : 3072 | ['a0', 'a1', 'a2', 'a3', 'a4', ...]
+        12.6s = Fit runtime
+        3072 features in original data used to generate 3072 features in processed data.
+        Train Data (Processed) Memory Usage: 23.41 MB (0.0% of available memory)
+Data preprocessing and feature engineering runtime = 12.92s ...
+AutoGluon will gauge predictive performance using evaluation metric: 'accuracy'
+        To change this, specify the eval_metric parameter of Predictor()
+Automatically generating train/validation split with holdout_frac=0.2, Train Rows: 799, Val Rows: 200
+User-specified model hyperparameters to be fit:
+{
+        'NN_TORCH': {},
+        'GBM': [{'extra_trees': True, 'ag_args': {'name_suffix': 'XT'}}, {}, 'GBMLarge'],
+        'CAT': {},
+        'XGB': {},
+        'FASTAI': {},
+        'RF': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'XT': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'KNN': [{'weights': 'uniform', 'ag_args': {'name_suffix': 'Unif'}}, {'weights': 'distance', 'ag_args': {'name_suffix': 'Dist'}}],
+}
+Fitting 13 L1 models ...
+Fitting model: KNeighborsUnif ...
+        0.21     = Validation score   (accuracy)
+        0.55s    = Training   runtime
+        0.24s    = Validation runtime
+Fitting model: KNeighborsDist ...
+        0.24     = Validation score   (accuracy)
+        0.54s    = Training   runtime
+        0.17s    = Validation runtime
+Fitting model: NeuralNetFastAI ...
+        0.38     = Validation score   (accuracy)
+        6.64s    = Training   runtime
+        0.03s    = Validation runtime
+Fitting model: LightGBMXT ...
+        0.385    = Validation score   (accuracy)
+        23.38s   = Training   runtime
+        0.02s    = Validation runtime
+Fitting model: LightGBM ...
+        0.395    = Validation score   (accuracy)
+        40.71s   = Training   runtime
+        0.02s    = Validation runtime
+Fitting model: RandomForestGini ...
+        0.365    = Validation score   (accuracy)
+        2.52s    = Training   runtime
+        0.14s    = Validation runtime
+Fitting model: RandomForestEntr ...
+        0.365    = Validation score   (accuracy)
+        2.68s    = Training   runtime
+        0.15s    = Validation runtime
+Fitting model: CatBoost ...
+        Many features detected (3072), dynamically setting 'colsample_bylevel' to 0.3255208333333333 to speed up training (Default = 1).
+        To disable this functionality, explicitly specify 'colsample_bylevel' in the model hyperparameters.
+        0.42     = Validation score   (accuracy)
+        88.35s   = Training   runtime
+        0.06s    = Validation runtime
+Fitting model: ExtraTreesGini ...
+        0.33     = Validation score   (accuracy)
+        3.01s    = Training   runtime
+        0.14s    = Validation runtime
+Fitting model: ExtraTreesEntr ...
+        0.35     = Validation score   (accuracy)
+        2.45s    = Training   runtime
+        0.14s    = Validation runtime
+Fitting model: XGBoost ...
+        0.415    = Validation score   (accuracy)
+        214.26s  = Training   runtime
+        0.04s    = Validation runtime
+Fitting model: NeuralNetTorch ...
+        0.345    = Validation score   (accuracy)
+        4.93s    = Training   runtime
+        0.04s    = Validation runtime
+Fitting model: LightGBMLarge ...
+        0.355    = Validation score   (accuracy)
+        154.31s  = Training   runtime
+        0.03s    = Validation runtime
+Fitting model: WeightedEnsemble_L2 ...
+        Ensemble Weights: {'CatBoost': 0.4, 'ExtraTreesEntr': 0.3, 'NeuralNetFastAI': 0.1, 'RandomForestGini': 0.1, 'XGBoost': 0.1}
+        0.46     = Validation score   (accuracy)
+        0.72s    = Training   runtime
+        0.0s     = Validation runtime
+AutoGluon training complete, total runtime = 561.08s ... Best model: "WeightedEnsemble_L2"
+TabularPredictor saved. To load, use: predictor = TabularPredictor.load("AutogluonModels/ag-20240221_081552")
+Loaded data from: /home/ddp/nlp/github/paper/mypaper_code/model_constructor/generated_scripts/cifar10_data/test_sample.csv | Columns = 3073 / 3073 | Rows = 249 -> 249
