@@ -34,7 +34,7 @@ cbs = [
 # Search for the best model.
 reg.fit(x_train, y_train, epochs=my_epochs, callbacks=cbs)
 
-reg.evaluate(x_test, y_test)
+print(reg.evaluate(x_test, y_test))
 
 
 # # First we export the model to a keras model
