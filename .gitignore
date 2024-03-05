@@ -16,3 +16,4 @@ graph
 best_pipeline
 variables.*
 automl/logs/ak_newspop.log
+automl/data/
