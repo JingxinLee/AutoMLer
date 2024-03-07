@@ -2,6 +2,7 @@ import os
 import warnings
 
 import numpy as np
+import autokeras as ak 
 
 warnings.filterwarnings('ignore')
 np.random.seed(123)

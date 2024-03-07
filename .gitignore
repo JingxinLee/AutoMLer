@@ -1,7 +1,6 @@
 .env
 launch.json
 settings.json
-*.csv
 *.pyc
 model_constructor/generated_scripts/results
 automl/AutogluonModels
@@ -16,4 +15,7 @@ graph
 best_pipeline
 variables.*
 automl/logs/ak_newspop.log
-automl/data/
+automl/tasks/fashionmnist/auto_model
+automl/tasks/fashionmnist/AutogluonModels
+automl/tasks/mnist/AutogluonModels/
+*.csv

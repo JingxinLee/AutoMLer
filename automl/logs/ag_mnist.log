@@ -1,0 +1,158 @@
+Accuracy: {'accuracy': 0.9856, 'balanced_accuracy': 0.9854967333936839, 'mcc': 0.9839950878694487}
+Predictions: 0       7
+1       2
+2       1
+3       0
+4       4
+       ..
+9995    2
+9996    3
+9997    4
+9998    5
+9999    6
+Name: label, Length: 10000, dtype: uint8
+
+
+(automl)  ddp@dell-Precision-7920-Tower-0  ~/nlp/github/paper/mypaper_code/automl/tasks/mnist  ↱ main  python -u ag_mnist.py > /home/ddp/nlp/github/paper/mypaper_code/automl/logs/ag_mnist.log
+2024-03-06 10:04:13.560996: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-03-06 10:04:13.655773: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2024-03-06 10:04:13.655824: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2024-03-06 10:04:13.657277: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-03-06 10:04:13.664900: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-03-06 10:04:16.183755: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+No path specified. Models will be saved in: "AutogluonModels/ag-20240306_020421"
+No presets specified! To achieve strong results with AutoGluon, it is recommended to use the available presets.
+        Recommended Presets (For more details refer to https://auto.gluon.ai/stable/tutorials/tabular/tabular-essentials.html#presets):
+        presets='best_quality'   : Maximize accuracy. Default time_limit=3600.
+        presets='high_quality'   : Strong accuracy with fast inference speed. Default time_limit=3600.
+        presets='good_quality'   : Good accuracy with very fast inference speed. Default time_limit=3600.
+        presets='medium_quality' : Fast training time, ideal for initial prototyping.
+Beginning AutoGluon training ...
+AutoGluon will save models to "AutogluonModels/ag-20240306_020421"
+=================== System Info ===================
+AutoGluon Version:  1.0.0
+Python Version:     3.10.13
+Operating System:   Linux
+Platform Machine:   x86_64
+Platform Version:   #63~20.04.1-Ubuntu SMP Wed Nov 30 13:40:16 UTC 2022
+CPU Count:          40
+Memory Avail:       51.12 GB / 125.55 GB (40.7%)
+Disk Space Avail:   26.91 GB / 915.32 GB (2.9%)
+===================================================
+Train Data Rows:    60000
+Train Data Columns: 784
+Label Column:       label
+AutoGluon infers your prediction problem is: 'multiclass' (because dtype of label-column == int, but few unique label-values observed).
+        10 unique label values:  [5, 0, 4, 1, 9, 2, 3, 6, 7, 8]
+        If 'multiclass' is not the correct problem_type, please manually specify the problem_type parameter during predictor init (You may specify problem_type as one of: ['binary', 'multiclass', 'regression'])
+Problem Type:       multiclass
+Preprocessing data ...
+Train Data Class Count: 10
+Using Feature Generators to preprocess the data ...
+Fitting AutoMLPipelineFeatureGenerator...
+        Available Memory:                    53100.27 MB
+        Train Data (Original)  Memory Usage: 44.86 MB (0.1% of available memory)
+        Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+        Stage 1 Generators:
+                Fitting AsTypeFeatureGenerator...
+                        Note: Converting 17 features to boolean dtype as they only contain 2 unique values.
+        Stage 2 Generators:
+                Fitting FillNaFeatureGenerator...
+        Stage 3 Generators:
+                Fitting IdentityFeatureGenerator...
+        Stage 4 Generators:
+                Fitting DropUniqueFeatureGenerator...
+        Stage 5 Generators:
+                Fitting DropDuplicatesFeatureGenerator...
+        Useless Original Features (Count: 67): ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '52', '53', '54', '55', '56', '57', '82', '83', '84', '85', '111', '112', '140', '141', '168', '476', '560', '644', '645', '671', '672', '673', '699', '700', '701', '727', '728', '729', '730', '754', '755', '756', '757', '758', '759', '780', '781', '782', '783']
+                These features carry no predictive signal and should be manually investigated.
+                This is typically a feature which has the same value for all rows.
+                These features do not need to be present at inference time.
+        Unused Original Features (Count: 93): ['13', '14', '15', '32', '33', '34', '35', '36', '37', '42', '43', '44', '45', '46', '50', '51', '58', '59', '60', '81', '87', '88', '109', '110', '113', '138', '139', '167', '195', '196', '223', '224', '251', '252', '279', '280', '307', '308', '335', '336', '363', '364', '365', '391', '392', '393', '419', '420', '421', '422', '447', '448', '449', '450', '475', '477', '503', '504', '505', '530', '531', '532', '533', '558', '559', '586', '587', '588', '615', '616', '617', '642', '643', '670', '674', '697', '698', '702', '703', '704', '724', '725', '726', '731', '732', '752', '753', '760', '761', '776', '777', '778', '779']
+                These features were not used to generate any of the output features. Add a feature generator compatible with these features to utilize them.
+                Features can also be unused if they carry very little information, such as being categorical but having almost entirely unique values or being duplicates of other features.
+                These features do not need to be present at inference time.
+                ('int', []) : 93 | ['13', '14', '15', '32', '33', ...]
+        Types of features in original data (raw dtype, special dtypes):
+                ('int', []) : 624 | ['12', '38', '39', '40', '41', ...]
+        Types of features in processed data (raw dtype, special dtypes):
+                ('int', []) : 624 | ['12', '38', '39', '40', '41', ...]
+        8.5s = Fit runtime
+        624 features in original data used to generate 624 features in processed data.
+        Train Data (Processed) Memory Usage: 35.71 MB (0.1% of available memory)
+Data preprocessing and feature engineering runtime = 10.53s ...
+AutoGluon will gauge predictive performance using evaluation metric: 'accuracy'
+        To change this, specify the eval_metric parameter of Predictor()
+Automatically generating train/validation split with holdout_frac=0.041666666666666664, Train Rows: 57500, Val Rows: 2500
+User-specified model hyperparameters to be fit:
+{
+        'NN_TORCH': {},
+        'GBM': [{'extra_trees': True, 'ag_args': {'name_suffix': 'XT'}}, {}, 'GBMLarge'],
+        'CAT': {},
+        'XGB': {},
+        'FASTAI': {},
+        'RF': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'XT': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'KNN': [{'weights': 'uniform', 'ag_args': {'name_suffix': 'Unif'}}, {'weights': 'distance', 'ag_args': {'name_suffix': 'Dist'}}],
+}
+Fitting 13 L1 models ...
+Fitting model: KNeighborsUnif ...
+        0.9724   = Validation score   (accuracy)
+        2.9s     = Training   runtime
+        2.28s    = Validation runtime
+Fitting model: KNeighborsDist ...
+        0.9732   = Validation score   (accuracy)
+        2.75s    = Training   runtime
+        1.82s    = Validation runtime
+Fitting model: NeuralNetFastAI ...
+        0.9864   = Validation score   (accuracy)
+        466.99s  = Training   runtime
+        0.25s    = Validation runtime
+Fitting model: LightGBMXT ...
+        0.9848   = Validation score   (accuracy)
+        366.67s  = Training   runtime
+        0.25s    = Validation runtime
+Fitting model: LightGBM ...
+        0.9844   = Validation score   (accuracy)
+        508.47s  = Training   runtime
+        0.49s    = Validation runtime
+Fitting model: RandomForestGini ...
+        0.97     = Validation score   (accuracy)
+        15.7s    = Training   runtime
+        1.07s    = Validation runtime
+Fitting model: RandomForestEntr ...
+        0.9716   = Validation score   (accuracy)
+        13.43s   = Training   runtime
+        0.27s    = Validation runtime
+Fitting model: CatBoost ...
+        0.9728   = Validation score   (accuracy)
+        795.86s  = Training   runtime
+        0.05s    = Validation runtime
+Fitting model: ExtraTreesGini ...
+        0.974    = Validation score   (accuracy)
+        13.7s    = Training   runtime
+        1.2s     = Validation runtime
+Fitting model: ExtraTreesEntr ...
+        0.9732   = Validation score   (accuracy)
+        10.66s   = Training   runtime
+        0.23s    = Validation runtime
+Fitting model: XGBoost ...
+        0.9812   = Validation score   (accuracy)
+        907.24s  = Training   runtime
+        0.43s    = Validation runtime
+Fitting model: NeuralNetTorch ...
+        0.9812   = Validation score   (accuracy)
+        353.9s   = Training   runtime
+        0.8s     = Validation runtime
+Fitting model: LightGBMLarge ...
+        0.9816   = Validation score   (accuracy)
+        668.33s  = Training   runtime
+        0.28s    = Validation runtime
+Fitting model: WeightedEnsemble_L2 ...
+        Ensemble Weights: {'NeuralNetFastAI': 0.6, 'LightGBMXT': 0.4}
+        0.9884   = Validation score   (accuracy)
+        5.35s    = Training   runtime
+        0.01s    = Validation runtime
+AutoGluon training complete, total runtime = 4161.82s ... Best model: "WeightedEnsemble_L2"
+TabularPredictor saved. To load, use: predictor = TabularPredictor.load("AutogluonModels/ag-20240306_020421")

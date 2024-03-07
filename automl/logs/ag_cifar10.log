@@ -23,6 +23,11 @@ Name: target, dtype: float64
 Name: target, dtype: int64
 {'accuracy': 0.39357429718875503, 'balanced_accuracy': 0.3858773181327529, 'mcc': 0.32627264604441025}
 
+
+
+
+
+
 (automl)  ddp@dell-Precision-7920-Tower-0  ~/nlp/github/paper/mypaper_code/automl  ↰ main  python ag_cifar10.py > logs/ag_cifar10.log
 No path specified. Models will be saved in: "AutogluonModels/ag-20240221_081552"
 No presets specified! To achieve strong results with AutoGluon, it is recommended to use the available presets.

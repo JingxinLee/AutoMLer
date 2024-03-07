@@ -31,7 +31,7 @@ test_data["label"] = y_test
 predictor = TabularPredictor(label='label').fit(train_data)
 
 # Evaluate and predict
-accuracy = predictor.evaluate(test_data, metric='accuracy')
+accuracy = predictor.evaluate(test_data)
 predictions = predictor.predict(test_data)
 
 print(f"Accuracy: {accuracy}")

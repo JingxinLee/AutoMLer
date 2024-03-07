@@ -1,0 +1,182 @@
+   Unnamed: 0  chern_simons  ...     volume  signature
+0       70746      0.090530  ...  11.393225         -2
+1      240827      0.232453  ...  12.742782          0
+2      155659     -0.144099  ...  15.236505          2
+3      239963     -0.171668  ...  17.279890         -8
+4       90504      0.235188  ...  16.749298          4
+
+[5 rows x 19 columns]
+count    10000.000000
+mean        -0.022000
+std          3.025166
+min        -12.000000
+25%         -2.000000
+50%          0.000000
+75%          2.000000
+max         12.000000
+Name: signature, dtype: float64
+0   -4
+1   -2
+2    0
+3    4
+4    2
+Name: signature, dtype: int64
+{'accuracy': 0.9468, 'balanced_accuracy': 0.7497187381027627, 'mcc': 0.9348029470616198}
+                  model  score_test  ...  can_infer fit_order
+0   WeightedEnsemble_L2      0.9468  ...       True        14
+1              LightGBM      0.9456  ...       True         5
+2               XGBoost      0.9448  ...       True        11
+3         LightGBMLarge      0.9444  ...       True        13
+4              CatBoost      0.9432  ...       True         8
+5      RandomForestEntr      0.9384  ...       True         7
+6       NeuralNetFastAI      0.9378  ...       True         3
+7        ExtraTreesGini      0.9360  ...       True         9
+8        ExtraTreesEntr      0.9358  ...       True        10
+9      RandomForestGini      0.9352  ...       True         6
+10           LightGBMXT      0.9320  ...       True         4
+11       NeuralNetTorch      0.9262  ...       True        12
+12       KNeighborsDist      0.2210  ...       True         2
+13       KNeighborsUnif      0.2180  ...       True         1
+
+[14 rows x 13 columns]
+
+
+
+
+(automl)  ddp@dell-Precision-7920-Tower-0  ~/nlp/github/paper/mypaper_code/automl/tasks/knottheory  ↱ main ±  python -u ag_knottheory.py > /home/ddp/nlp/github/paper/mypaper_code/automl/logs/ag_knottheory.log
+No path specified. Models will be saved in: "AutogluonModels/ag-20240306_095217"
+No presets specified! To achieve strong results with AutoGluon, it is recommended to use the available presets.
+        Recommended Presets (For more details refer to https://auto.gluon.ai/stable/tutorials/tabular/tabular-essentials.html#presets):
+        presets='best_quality'   : Maximize accuracy. Default time_limit=3600.
+        presets='high_quality'   : Strong accuracy with fast inference speed. Default time_limit=3600.
+        presets='good_quality'   : Good accuracy with very fast inference speed. Default time_limit=3600.
+        presets='medium_quality' : Fast training time, ideal for initial prototyping.
+Beginning AutoGluon training ...
+AutoGluon will save models to "AutogluonModels/ag-20240306_095217"
+=================== System Info ===================
+AutoGluon Version:  1.0.0
+Python Version:     3.10.13
+Operating System:   Linux
+Platform Machine:   x86_64
+Platform Version:   #63~20.04.1-Ubuntu SMP Wed Nov 30 13:40:16 UTC 2022
+CPU Count:          40
+Memory Avail:       60.68 GB / 125.55 GB (48.3%)
+Disk Space Avail:   23.16 GB / 915.32 GB (2.5%)
+===================================================
+Train Data Rows:    10000
+Train Data Columns: 18
+Label Column:       signature
+AutoGluon infers your prediction problem is: 'multiclass' (because dtype of label-column == int, but few unique label-values observed).
+        First 10 (of 13) unique label values:  [-2, 0, 2, -8, 4, -4, -6, 8, 6, 10]
+        If 'multiclass' is not the correct problem_type, please manually specify the problem_type parameter during predictor init (You may specify problem_type as one of: ['binary', 'multiclass', 'regression'])
+Problem Type:       multiclass
+Preprocessing data ...
+Warning: Some classes in the training set have fewer than 10 examples. AutoGluon will only keep 9 out of 13 classes for training and will not try to predict the rare classes. To keep more classes, increase the number of datapoints from these rare classes in the training data or reduce label_count_threshold.
+Fraction of data from classes with at least 10 examples that will be kept for training models: 0.9984
+Train Data Class Count: 9
+Using Feature Generators to preprocess the data ...
+Fitting AutoMLPipelineFeatureGenerator...
+        Available Memory:                    62137.41 MB
+        Train Data (Original)  Memory Usage: 1.37 MB (0.0% of available memory)
+        Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+        Stage 1 Generators:
+                Fitting AsTypeFeatureGenerator...
+                        Note: Converting 5 features to boolean dtype as they only contain 2 unique values.
+        Stage 2 Generators:
+                Fitting FillNaFeatureGenerator...
+        Stage 3 Generators:
+                Fitting IdentityFeatureGenerator...
+        Stage 4 Generators:
+                Fitting DropUniqueFeatureGenerator...
+        Stage 5 Generators:
+                Fitting DropDuplicatesFeatureGenerator...
+        Useless Original Features (Count: 1): ['Symmetry_D8']
+                These features carry no predictive signal and should be manually investigated.
+                This is typically a feature which has the same value for all rows.
+                These features do not need to be present at inference time.
+        Types of features in original data (raw dtype, special dtypes):
+                ('float', []) : 14 | ['chern_simons', 'cusp_volume', 'injectivity_radius', 'longitudinal_translation', 'meridinal_translation_imag', ...]
+                ('int', [])   :  3 | ['Unnamed: 0', 'hyperbolic_adjoint_torsion_degree', 'hyperbolic_torsion_degree']
+        Types of features in processed data (raw dtype, special dtypes):
+                ('float', [])     : 9 | ['chern_simons', 'cusp_volume', 'injectivity_radius', 'longitudinal_translation', 'meridinal_translation_imag', ...]
+                ('int', [])       : 3 | ['Unnamed: 0', 'hyperbolic_adjoint_torsion_degree', 'hyperbolic_torsion_degree']
+                ('int', ['bool']) : 5 | ['Symmetry_0', 'Symmetry_D3', 'Symmetry_D4', 'Symmetry_D6', 'Symmetry_Z/2 + Z/2']
+        0.0s = Fit runtime
+        17 features in original data used to generate 17 features in processed data.
+        Train Data (Processed) Memory Usage: 0.96 MB (0.0% of available memory)
+Data preprocessing and feature engineering runtime = 0.06s ...
+AutoGluon will gauge predictive performance using evaluation metric: 'accuracy'
+        To change this, specify the eval_metric parameter of Predictor()
+Automatically generating train/validation split with holdout_frac=0.1, Train Rows: 8985, Val Rows: 999
+User-specified model hyperparameters to be fit:
+{
+        'NN_TORCH': {},
+        'GBM': [{'extra_trees': True, 'ag_args': {'name_suffix': 'XT'}}, {}, 'GBMLarge'],
+        'CAT': {},
+        'XGB': {},
+        'FASTAI': {},
+        'RF': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'XT': [{'criterion': 'gini', 'ag_args': {'name_suffix': 'Gini', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'entropy', 'ag_args': {'name_suffix': 'Entr', 'problem_types': ['binary', 'multiclass']}}, {'criterion': 'squared_error', 'ag_args': {'name_suffix': 'MSE', 'problem_types': ['regression', 'quantile']}}],
+        'KNN': [{'weights': 'uniform', 'ag_args': {'name_suffix': 'Unif'}}, {'weights': 'distance', 'ag_args': {'name_suffix': 'Dist'}}],
+}
+Fitting 13 L1 models ...
+Fitting model: KNeighborsUnif ...
+        0.2232   = Validation score   (accuracy)
+        0.06s    = Training   runtime
+        0.05s    = Validation runtime
+Fitting model: KNeighborsDist ...
+        0.2132   = Validation score   (accuracy)
+        0.03s    = Training   runtime
+        0.05s    = Validation runtime
+Fitting model: NeuralNetFastAI ...
+        0.9439   = Validation score   (accuracy)
+        11.95s   = Training   runtime
+        0.02s    = Validation runtime
+Fitting model: LightGBMXT ...
+        0.9459   = Validation score   (accuracy)
+        8.69s    = Training   runtime
+        0.02s    = Validation runtime
+Fitting model: LightGBM ...
+        0.956    = Validation score   (accuracy)
+        6.24s    = Training   runtime
+        0.01s    = Validation runtime
+Fitting model: RandomForestGini ...
+        0.9449   = Validation score   (accuracy)
+        1.85s    = Training   runtime
+        0.16s    = Validation runtime
+Fitting model: RandomForestEntr ...
+        0.9499   = Validation score   (accuracy)
+        1.56s    = Training   runtime
+        0.16s    = Validation runtime
+Fitting model: CatBoost ...
+        0.956    = Validation score   (accuracy)
+        32.28s   = Training   runtime
+        0.01s    = Validation runtime
+Fitting model: ExtraTreesGini ...
+        0.9469   = Validation score   (accuracy)
+        2.27s    = Training   runtime
+        0.16s    = Validation runtime
+Fitting model: ExtraTreesEntr ...
+        0.9429   = Validation score   (accuracy)
+        2.25s    = Training   runtime
+        0.15s    = Validation runtime
+Fitting model: XGBoost ...
+        0.957    = Validation score   (accuracy)
+        6.42s    = Training   runtime
+        0.04s    = Validation runtime
+Fitting model: NeuralNetTorch ...
+        0.9409   = Validation score   (accuracy)
+        46.09s   = Training   runtime
+        0.01s    = Validation runtime
+Fitting model: LightGBMLarge ...
+        0.9499   = Validation score   (accuracy)
+        14.63s   = Training   runtime
+        0.03s    = Validation runtime
+Fitting model: WeightedEnsemble_L2 ...
+        Ensemble Weights: {'NeuralNetFastAI': 0.294, 'RandomForestEntr': 0.176, 'ExtraTreesGini': 0.176, 'XGBoost': 0.176, 'KNeighborsUnif': 0.118, 'LightGBMXT': 0.059}
+        0.966    = Validation score   (accuracy)
+        0.93s    = Training   runtime
+        0.0s     = Validation runtime
+AutoGluon training complete, total runtime = 137.84s ... Best model: "WeightedEnsemble_L2"
+TabularPredictor saved. To load, use: predictor = TabularPredictor.load("AutogluonModels/ag-20240306_095217")
+Loaded data from: https://raw.githubusercontent.com/mli/ag-docs/main/knot_theory/test.csv | Columns = 19 / 19 | Rows = 5000 -> 5000
