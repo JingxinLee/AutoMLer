@@ -5,17 +5,13 @@ import os
 from ast import literal_eval
 from sentence_transformers import SentenceTransformer, util
 import glob
-import pandas as pd
-import numpy as np
-from keras.utils import normalize, to_categorical
-from sklearn.model_selection import train_test_split
 
 _ = load_dotenv(find_dotenv())  # read local .env file
 client = OpenAI()
 OpenAI.api_key = os.getenv("OPENAI_API_KEY")
 
 
-# model = "gpt-3.5-turbo-1106" or "gpt-4-1106-preview"
+# model = "gpt-3.5-turbo-0125" or "gpt-4-0125-preview"
 def get_completion(prompt, model="gpt-3.5-turbo-0125"):
     messages = [{"role": "user", "content": prompt}]
     response = client.chat.completions.create(
@@ -111,136 +107,6 @@ def select_model_from_mdfiles(task_description, markdown_files_path):
     return most_relevant_content
 
 
-def local_dataset_inference(train_filepath, test_filepath, label_column):
-    if test_filepath is None:
-        try:
-            X = pd.read_csv(train_filepath)
-            Y = X[label_column]
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, Y, test_size=0.2, random_state=42
-            )
-        except:
-            print("The data file path is invalid or something wrong with the data.")
-            return
-    else:
-        try:
-            X_train = pd.read_csv(train_filepath)
-            y_train = X_train[label_column]
-            X_test = pd.read_csv(test_filepath)
-            y_test = X_test[label_column]
-        except:
-            print("The data file path is invalid or something wrong with the data.")
-            return
-    # Normalize the data
-    X_train = normalize(X_train, axis=1)
-    X_test = normalize(X_test, axis=1)
-    # One-hot encode the labels
-    y_train = to_categorical(y_train)
-    y_test = to_categorical(y_test)
-
-    X_head = X_train.head()
-    y_head = y_train.head()
-    # print("X_head\n", X_head)
-    # print("y_head\n", y_head)
-
-    # TASK INFERENCE
-    taskInference_prompt = f"""
-        Your task is to infer the task based on the training data, X_head is the features and y_head is the labels. 
-        Both the X_head and y_head are enclosed in the triple backticks.
-        you should follow these steps when you infer the task:
-        1. Load the X_head and y_head data.
-        2. Infer the task based on the X_head and y_head data.
-        3. Return the task.
- 
-        At the end, please return the task.
-        
-        X_head: ```{X_head}```
-        y_head: ```{y_head}```
-        
-    """
-    taskInference_response = get_completion(taskInference_prompt)
-    print("taskInference_response:\n ", taskInference_response)
-    print("*" * 100)
-    
-    # MODEL SELECT
-    markdown_file_contents = select_model_from_mdfiles(
-        taskInference_response,
-        "/root/paper/mypaper_code/model_constructor/data/MarkdownFiles",
-    )
-    print("markdown_file_contents:\n ", markdown_file_contents)
-    print("*" * 100)
-
-    model_select_prompt = f"""
-    Your task is to identify the most suitable model for the following task, The task is enclosed in triple backticks.
-    Additionally, consider the models described in the Markdown files provided. If the most suitable model is found within the Markdown files, return its specific name, such as 'microsoft/resnet-50' or 'microsoft/resnet-18'.
-    Do not give me explanation information. Only output a list of the models after you selected and compared. eg. ['microsoft/resnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview'].
-    If there are no models suitable, output an empty list [].
-    
-    task: ```{taskInference_response}```
-    markdown_files: ```{markdown_file_contents}```
-    """
-
-    model_select_response = get_completion(model_select_prompt)
-    print("model_select_response:\n ", model_select_response)
-    model_selected_list = literal_eval(model_select_response)
-    most_suitable_model = model_selected_list[0]
-    print("most_suitable_model:\n ", most_suitable_model)
-    print("*" * 100)
-    
-    
-    # TRAINER which use Hugging Face Model and Trainer
-    # 针对Tabular Data：BreastCancer,Californiahousing,KnotTheory,Titanic
-    hf_model_trainer_prompt = f"""
-        Your task is to generate training code snippet for the TASK with the MODEL give you. The TASK and MODEL is enclosed in triple backticks.
-        You should follow these steps when you write the code snippet:
-        1. Import the necessary libraries and modules,such as pandas,numpy,keras,sklearn,datasets,transformers etc.
-        2. The TRAIN_FILEPATH and TEST_PATH and LABEL is enclosed in the triple backticks. You should follow these steps:
-            2.1 If TEST_PATH is not given, just Use 'pandas.read_csv' function to load the TRAIN_FILEPATH and name it the X_train. If TEST_PATH is given, also use 'pandas.read_csv' function to load the TEST_FILEPATH then name it X_test.
-            2.2 from keras.utils import normalize, to_categorical. Use normalize function to normalize the X_train and X_test. Use to_categorical function to one-hot encode the y_train and y_test.
-            2.3 Split the data into training and testing sets if necessary.
-            2.4 Get the head of the X_train and y_train.
-        3. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL. If the task related to text, use Tokenizer to tokenize the text. 
-            If the task related to image classfication, do not use tokenizer but use AutoModelForImageClassification to initialize the model. If the task is a Machine Learning task, then use machine learning methods to deal.
-        4. Define optimizers. The optimizers(`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple containing the optimizer and the scheduler to use. 
-           First define opimizer, then define scheduler. Choose the most suitable opimizer and scheduler for the model and task. 
-            Example code: optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5) 
-                          scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 1 / (1 + decay * epoch))
-                          opimizers = (opimizer, scheduler)
-        5. Train the model on the train dataset. You must provide the optimizers which you defined before in Trainer.
-            Example code: trainer = Trainer(..., opimizers=opimizers) 
-        6. Make predictions on the testing set.
-        7. Evaluate the model.
-        
-
-        MODEL: ```{most_suitable_model}```
-        TASK: ```{taskInference_response}```
-        TRAIN_FILEPATH:```{train_filepath}```
-        TEST_FILEPATH:```{test_filepath}```
-        LABEL:```{label_column}```
-        
-    """
-    # If not provided, a default optimizer and scheduler will be created using the model's configuration.
-    hf_model_trainer_response = get_completion(
-        hf_model_trainer_prompt, model="gpt-4-0125-preview"
-    )
-    print("hf_model_trainer_response", hf_model_trainer_response)
-    print("*" * 100)
-
-    try:
-        with open(
-            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf2.py", "w"
-        ) as f:
-            f.write(hf_model_trainer_response)
-    except:
-        with open(f"./generated_scripts/{most_suitable_model}_hf2.py", "w") as f:
-            f.write(hf_model_trainer_response)
-    
-    
-    
-def tf_dataset_inference(dataset_name):
-    # Dataset for Mnist, FashionMnist,
-
-
 def openml_task_inference(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
@@ -296,7 +162,6 @@ def openml_task_inference(dataset_name):
     task: ```{taskInference_response}```
     markdown_files: ```{markdown_file_contents}```
     """
-
     model_select_response = get_completion(model_select_prompt)
     print("model_select_response:\n ", model_select_response)
     model_selected_list = literal_eval(model_select_response)
@@ -305,7 +170,6 @@ def openml_task_inference(dataset_name):
     print("*" * 100)
 
     # TRAINER which use Hugging Face Model and Trainer
-    # 针对OpenML Dataset CIFAR_10
     # 切成2段，分段执行
     # 第7个单独拎出来
     # Prompt按照markdown语法来写 加粗 few shot learning写法：举例子 openml dimension check——》transform
