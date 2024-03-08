@@ -161,7 +161,7 @@ def local_dataset_inference(train_filepath, test_filepath, label_column):
     taskInference_response = get_completion(taskInference_prompt)
     print("taskInference_response:\n ", taskInference_response)
     print("*" * 100)
-    
+
     # MODEL SELECT
     markdown_file_contents = select_model_from_mdfiles(
         taskInference_response,
@@ -186,8 +186,7 @@ def local_dataset_inference(train_filepath, test_filepath, label_column):
     most_suitable_model = model_selected_list[0]
     print("most_suitable_model:\n ", most_suitable_model)
     print("*" * 100)
-    
-    
+
     # TRAINER which use Hugging Face Model and Trainer
     # 针对Tabular Data：BreastCancer,Californiahousing,KnotTheory,Titanic
     hf_model_trainer_prompt = f"""
@@ -228,17 +227,117 @@ def local_dataset_inference(train_filepath, test_filepath, label_column):
 
     try:
         with open(
-            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf2.py", "w"
+            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", "w"
         ) as f:
             f.write(hf_model_trainer_response)
     except:
-        with open(f"./generated_scripts/{most_suitable_model}_hf2.py", "w") as f:
+        with open(f"./generated_scripts/{most_suitable_model}_hf.py", "w") as f:
             f.write(hf_model_trainer_response)
-    
-    
-    
+
+
 def tf_dataset_inference(dataset_name):
     # Dataset for Mnist, FashionMnist,
+
+    # Normalize the data
+    X_train = normalize(X_train, axis=1)
+    X_test = normalize(X_test, axis=1)
+    # One-hot encode the labels
+    y_train = to_categorical(y_train)
+    y_test = to_categorical(y_test)
+
+    X_head = X_train.head()
+    y_head = y_train.head()
+    # print("X_head\n", X_head)
+    # print("y_head\n", y_head)
+
+    # TASK INFERENCE
+    taskInference_prompt = f"""
+        Your task is to infer the task based on the training data, X_head is the features and y_head is the labels. 
+        Both the X_head and y_head are enclosed in the triple backticks.
+        you should follow these steps when you infer the task:
+        1. Load the X_head and y_head data.
+        2. Infer the task based on the X_head and y_head data.
+        3. Return the task.
+ 
+        At the end, please return the task.
+        
+        X_head: ```{X_head}```
+        y_head: ```{y_head}```
+        
+    """
+    taskInference_response = get_completion(taskInference_prompt)
+    print("taskInference_response:\n ", taskInference_response)
+    print("*" * 100)
+
+    # MODEL SELECT
+    markdown_file_contents = select_model_from_mdfiles(
+        taskInference_response,
+        "/root/paper/mypaper_code/model_constructor/data/MarkdownFiles",
+    )
+    print("markdown_file_contents:\n ", markdown_file_contents)
+    print("*" * 100)
+
+    model_select_prompt = f"""
+    Your task is to identify the most suitable model for the following task, The task is enclosed in triple backticks.
+    Additionally, consider the models described in the Markdown files provided. If the most suitable model is found within the Markdown files, return its specific name, such as 'microsoft/resnet-50' or 'microsoft/resnet-18'.
+    Do not give me explanation information. Only output a list of the models after you selected and compared. eg. ['microsoft/resnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview'].
+    If there are no models suitable, output an empty list [].
+    
+    task: ```{taskInference_response}```
+    markdown_files: ```{markdown_file_contents}```
+    """
+
+    model_select_response = get_completion(model_select_prompt)
+    print("model_select_response:\n ", model_select_response)
+    model_selected_list = literal_eval(model_select_response)
+    most_suitable_model = model_selected_list[0]
+    print("most_suitable_model:\n ", most_suitable_model)
+    print("*" * 100)
+
+    # TRAINER which use Hugging Face Model and Trainer
+    # 针对Tabular Data：BreastCancer,Californiahousing,KnotTheory,Titanic
+    hf_model_trainer_prompt = f"""
+        Your task is to generate training code snippet for the TASK with the MODEL give you. The TASK and MODEL is enclosed in triple backticks.
+        You should follow these steps when you write the code snippet:
+        1. Import the necessary libraries and modules,such as pandas,numpy,keras,sklearn,datasets,transformers etc.
+        2. from keras.datasets import the dataset you want to use, such as mnist, fashion_mnist. 
+            For example: from keras.datasets import mnist (x_train, y_train), (x_test, y_test) = mnist.load_data()
+        3. Preprocess the data such as reshape and create Dataframe if necessary.
+            Example code: train_data = pd.DataFrame(x_train.reshape(-1, 28*28), index=range(len(x_train)))   train_data["label"] = y_train
+            test_data = pd.DataFrame(x_test.reshape(-1, 28*28), index=range(len(x_test)))   test_data["label"] = y_test
+        3. Initialize the MODEL. Be sure to use the most suitable model based on the MODEL. If the task related to text, use Tokenizer to tokenize the text. 
+            If the task related to image classfication, do not use tokenizer but use AutoModelForImageClassification to initialize the model. If the task is a Machine Learning task, then use machine learning methods to deal.
+        4. Define optimizers. The optimizers(`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple containing the optimizer and the scheduler to use. 
+           First define opimizer, then define scheduler. Choose the most suitable opimizer and scheduler for the model and task. 
+            Example code: optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5) 
+                          scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 1 / (1 + decay * epoch))
+                          opimizers = (opimizer, scheduler)
+        5. Train the model on the train dataset. You must provide the optimizers which you defined before in Trainer.
+            Example code: trainer = Trainer(..., opimizers=opimizers) 
+        6. Make predictions on the testing set.
+        7. Evaluate the model.
+        
+
+        MODEL: ```{most_suitable_model}```
+        TASK: ```{taskInference_response}```
+        DATASET_NAME: ```{dataset_name}```
+
+    """
+    # If not provided, a default optimizer and scheduler will be created using the model's configuration.
+    hf_model_trainer_response = get_completion(
+        hf_model_trainer_prompt, model="gpt-4-0125-preview"
+    )
+    print("hf_model_trainer_response", hf_model_trainer_response)
+    print("*" * 100)
+
+    try:
+        with open(
+            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", "w"
+        ) as f:
+            f.write(hf_model_trainer_response)
+    except:
+        with open(f"./generated_scripts/{most_suitable_model}_hf.py", "w") as f:
+            f.write(hf_model_trainer_response)
 
 
 def openml_task_inference(dataset_name):
