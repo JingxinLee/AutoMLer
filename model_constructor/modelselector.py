@@ -58,6 +58,11 @@ def find_most_k_similar(embedding, embeddings_dict, k=5):
     return most_k_similar
 
 
+def model_selector(query, all_markdown_files, k=3):
+    pass
+    return model_select_response, model_selected_list
+
+
 def main():
     all_markdown_files = iterate_folder_files(
         root_directory="MarkdownFiles", markdown_files_to_process=[]
@@ -112,6 +117,7 @@ def main():
     print("model_select_response:\n ", model_select_response)
     model_selected_list = literal_eval(model_select_response)
     print("model_selected_list: ", model_selected_list)
+
 
 if __name__ == "__main__":
     main()

@@ -10,13 +10,6 @@ import numpy as np
 from keras.utils import normalize, to_categorical
 from sklearn.model_selection import train_test_split
 
-from preprocess import (
-    load_data_from_file,
-    load_data_from_tf_dataset,
-    load_data_from_openml,
-    preprocess_data,
-)
-
 _ = load_dotenv(find_dotenv())  # read local .env file
 client = OpenAI()
 OpenAI.api_key = os.getenv("OPENAI_API_KEY")
@@ -117,14 +110,8 @@ def select_model_from_mdfiles(task_description, markdown_files_path):
 
     return most_relevant_content
 
-
-def taskInference(
-    train_filepath, test_filepath, label_column, dataset_name, taskInference_prompt
-):
-    if dataset_name:
-        pass
-    return taskInference_response
-
+def load_data_from_openml(dataset_name):
+    pass
 
 def local_dataset_inference(train_filepath, test_filepath, label_column):
     if test_filepath is None:
