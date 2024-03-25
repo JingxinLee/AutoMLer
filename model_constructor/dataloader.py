@@ -13,7 +13,7 @@ from preprocess import augment_audio, augment_image, augment_text, augment_video
 
 
 _ = load_dotenv(find_dotenv())  # read local .env file
-client = OpenAI()
+client = OpenAI(baseurl='https://gateway.ai.cloudflare.com/v1/0e0f6120acb254091967e2c35338dd94/GATEWAY/openai')
 OpenAI.api_key = os.getenv("OPENAI_API_KEY")
 
 

@@ -6,7 +6,7 @@ from PIL import Image
 from torchvision import transforms
 import os
 import random
-import torchaudio
+# import torchaudio
 from torchvision.io import read_video
 from langchain.document_loaders import UnstructuredMarkdownLoader
 from collections import Counter
@@ -20,6 +20,8 @@ import mimetypes
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from keras.utils import normalize, to_categorical
+import pandas as pd
+import openml
 
 
 def process_markdown_batch(markdown_files):
@@ -312,16 +314,16 @@ def normalize_image(examples):
     return apply_transform(examples)
 
 
-def normalize_audio(examples):
-    def apply_transform(examples):
-        audios = [
-            torchaudio.load(ex["audio"])[0]
-            / torch.max(torch.abs(torchaudio.load(ex["audio"])[0]))
-            for ex in examples
-        ]
-        return {"audio": audios}
+# def normalize_audio(examples):
+#     def apply_transform(examples):
+#         audios = [
+#             torchaudio.load(ex["audio"])[0]
+#             / torch.max(torch.abs(torchaudio.load(ex["audio"])[0]))
+#             for ex in examples
+#         ]
+#         return {"audio": audios}
 
-    return apply_transform(examples)
+#     return apply_transform(examples)
 
 
 def normalize_video(examples):
@@ -434,14 +436,14 @@ def normalize_video_folder(folder_path):
 
 
 # Audio
-def load_and_normalize_audio(filename):
-    # 加载音频文件
-    waveform, sample_rate = torchaudio.load(filename)
+# def load_and_normalize_audio(filename):
+#     # 加载音频文件
+#     waveform, sample_rate = torchaudio.load(filename)
 
-    # 归一化音频波形
-    waveform = waveform / torch.max(torch.abs(waveform))
+#     # 归一化音频波形
+#     waveform = waveform / torch.max(torch.abs(waveform))
 
-    return waveform, sample_rate
+#     return waveform, sample_rate
 
 
 def normalize_audio_folder(folder_path):

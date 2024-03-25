@@ -17,8 +17,9 @@ from preprocess import (
     preprocess_data,
 )
 
+# os.environ['OPENAL_API_BASE'] = ''
 _ = load_dotenv(find_dotenv())  # read local .env file
-client = OpenAI()
+client = OpenAI(base_url="https://openai-proxy-956.pages.dev/v1")
 OpenAI.api_key = os.getenv("OPENAI_API_KEY")
 
 
