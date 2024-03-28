@@ -110,13 +110,14 @@ def train(args):
     train_df = pd.read_csv(os.path.join(args.data_path, "train.csv"))
     test_df = pd.read_csv(os.path.join(args.data_path, "test.csv"))
     # For the purpose of generating submission file
-    submission_df = pd.read_csv(os.path.join(args.data_path, "sample_submission.csv"))
+    submission_df = pd.read_csv(os.path.join(args.data_path, "rmse_submission.csv"))
     train_df = preprocess(
         train_df, with_tax_values=args.with_tax_values, has_label=True
     )
     test_df = preprocess(test_df, with_tax_values=args.with_tax_values, has_label=False)
     label_column = "Sold Price"
-    eval_metric = "r2"
+    # eval_metric = "r2"
+    eval_metric = "root_mean_squared_error"
 
     automm_hyperparameters = get_automm_hyperparameters(
         args.automm_mode, args.text_backbone, args.cat_as_text

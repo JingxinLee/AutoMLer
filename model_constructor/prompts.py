@@ -3,6 +3,9 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from keras.utils import normalize, to_categorical
 
+PROMPTS_BREASTCANCER = 'Please give me the most suitable model for Wisconsin Breast Cancer dataset with the train and evaluate code'
+PROMPTS_CALIFORNIAHOUSING = 'Please give me the most suitable model for California Housing dataset with the train and evaluate code'
+
 
 def load_data_from_openml(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)

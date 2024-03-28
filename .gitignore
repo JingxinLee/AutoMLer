@@ -19,3 +19,6 @@ automl/tasks/fashionmnist/auto_model
 automl/tasks/fashionmnist/AutogluonModels
 automl/tasks/mnist/AutogluonModels/
 *.csv
+automl/data/california-house-prices/*
+events.out.*
+*.pkl
