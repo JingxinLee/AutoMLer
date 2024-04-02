@@ -8,6 +8,8 @@ from transformers import (
     TrainingArguments,
 )
 import torch
+from sklearn.metrics import accuracy_score, f1_score
+import numpy as np
 
 # Load and preprocess the Titanic dataset
 df = pd.read_csv(
@@ -60,6 +62,15 @@ class TitanicDataset(torch.utils.data.Dataset):
 train_dataset = TitanicDataset(train_encodings, train_df["survived"].tolist())
 eval_dataset = TitanicDataset(eval_encodings, eval_df["survived"].tolist())
 
+
+def compute_metrics(eval_pred) -> dict:
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)
+    acc = accuracy_score(labels, predictions)
+    f1 = f1_score(labels, predictions, average="micro")
+    return {"accuracy": acc, "f1": f1}
+
+
 # Training arguments
 training_args = TrainingArguments(
     output_dir="./results",
@@ -78,6 +89,7 @@ trainer = Trainer(
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
+    compute_metrics=compute_metrics,
 )
 
 # Train and evaluate
