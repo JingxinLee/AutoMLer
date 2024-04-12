@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
-            "python": "/home/ddp/anaconda3/envs/automl/bin/python",
+            "python": "/root/anaconda3/envs/paper/bin/python",
             "program": "${file}",
             "purpose": [
                 "debug-in-terminal"
