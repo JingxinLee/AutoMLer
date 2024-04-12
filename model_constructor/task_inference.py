@@ -538,8 +538,8 @@ def openml_task_inference(dataset_name):
     most_suitable_model_nums = 3
     
     model_select_prompt = f"""
-    Your task is to identify the most suitable models for the following task, The task is enclosed in triple backticks.You should give me at least N models. N is enclosed in triple backticks.
-    return its specific name, such as 'microsoft/resnet-50' or 'microsoft/resnet-18'.
+    Your task is to identify the most suitable models for the following task, The task is enclosed in triple backticks.You should give me at least N models suitable for the task. N is enclosed in triple backticks.
+    return its specific name, such as 'microsoft/resnet-50' or 'microsoft/resnet-18'. If the most suitable way is Machine learning algorithm, return the ML algorithm name.
     Do not give me explanation information. Only output a list of the models after you selected and compared. eg. ['microsoft/resnet-50', 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview'].
     If there are no models suitable, output an empty list [].
     
@@ -550,7 +550,7 @@ def openml_task_inference(dataset_name):
     model_select_response = get_completion(model_select_prompt)
     print("model_select_response:\n ", model_select_response)
     model_selected_list = literal_eval(model_select_response)
-    most_suitable_model = model_selected_list[-1]
+    most_suitable_model = model_selected_list[0]
     print("most_suitable_model:\n ", most_suitable_model)
     print("*" * 100)
 
@@ -602,18 +602,18 @@ def openml_task_inference(dataset_name):
     """
     # If not provided, a default optimizer and scheduler will be created using the model's configuration.
     hf_model_trainer_response = get_completion(
-        hf_model_trainer_prompt, model="gpt-4-turbo-preview"
+        hf_model_trainer_prompt, model="gpt-3.5-turbo"
     )
     print("hf_model_trainer_response", hf_model_trainer_response)
     print("*" * 100)
 
     try:
         with open(
-            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf2.py", "w"
+            f"./generated_scripts/{most_suitable_model.split('/')[1]}_hf.py", "w"
         ) as f:
             f.write(hf_model_trainer_response)
     except:
-        with open(f"./generated_scripts/{most_suitable_model}_hf2.py", "w") as f:
+        with open(f"./generated_scripts/{most_suitable_model}_hf.py", "w") as f:
             f.write(hf_model_trainer_response)
             
             
@@ -622,5 +622,7 @@ if __name__ == "__main__":
     # openml_task_inference('CIFAR_10')
     # openml_task_inference(31) # credit-g
     # openml_task_inference(37) # diabetes
-    openml_task_inference(1462)# banknote-authentication
+    # openml_task_inference(1462)# banknote-authentication
+    # openml_task_inference(312) # scene
+    openml_task_inference(4534) # PhishingWebsites
     # openml_task_inference(1464) # blood-transfusion-service-center
