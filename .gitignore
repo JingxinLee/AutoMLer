@@ -22,3 +22,6 @@ automl/tasks/mnist/AutogluonModels/
 automl/data/california-house-prices/*
 events.out.*
 *.pkl
+*.ubj
+__version__
+

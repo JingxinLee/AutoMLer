@@ -25,6 +25,17 @@ y = le.fit_transform(y)
 # 将数据集分为训练集和测试集
 train_features, test_features, train_labels, test_labels = train_test_split(X, y, test_size=0.2, random_state=42)
 
+train_df = pd.DataFrame(train_features)
+train_df['target'] = train_labels
+
+# 5.2 Create a pandas DataFrame test_df
+test_df = pd.DataFrame(test_features)
+test_df['target'] = test_labels
+
+# 5.3 Use to_csv function to generate the csv file
+train_df.to_csv('train_data.csv', index=False)
+test_df.to_csv('test_data.csv', index=False)
+
 # train_features, test_features, train_labels, test_labels = train_test_split(dataset_features, dataset_labels, test_size=0.2)
 
 ############ Random Forest #########################

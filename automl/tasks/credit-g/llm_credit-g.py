@@ -23,6 +23,7 @@ Y = le.fit_transform(y)
 # Step 3: Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
+
 # Step 5: Convert the data to CSV files for easy reading
 train_df = pd.DataFrame(X_train)
 train_df['target'] = y_train

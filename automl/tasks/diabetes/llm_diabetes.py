@@ -29,7 +29,7 @@ from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import LabelEncoder
-
+import pandas as pd 
 
 # 加载diabetes数据集
 diabetes = openml.datasets.get_dataset(37)
@@ -39,6 +39,14 @@ y = le.fit_transform(y)
 
 # 将数据集分为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+train_df = pd.DataFrame(X_train)
+train_df['target'] = y_train
+test_df = pd.DataFrame(X_test)
+test_df['target'] = y_test
+
+train_df.to_csv('train.csv', index=False)
+test_df.to_csv('test.csv', index=False)
 
 # 选择最佳模型（这里示例选择随机森林）
 best_model = RandomForestRegressor(n_estimators=100, random_state=42)

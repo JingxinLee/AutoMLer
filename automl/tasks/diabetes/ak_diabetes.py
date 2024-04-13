@@ -44,3 +44,5 @@ results = regression_model.predict(x_test)
 
 my_mse = mse_loss(y_test, results)
 print(f"Test MSE = {my_mse:4f}")
+
+# Test MSE = 1.841131

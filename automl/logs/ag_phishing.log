@@ -1,0 +1,24 @@
+   having_IP_Address  URL_Length  ...  Statistical_report  target
+0                  1          -1  ...                   1       1
+1                 -1          -1  ...                   1      -1
+2                  1           1  ...                   1       1
+3                 -1          -1  ...                   1       1
+4                 -1          -1  ...                   1      -1
+
+[5 rows x 31 columns]
+count    8844.000000
+mean        0.108548
+std         0.994147
+min        -1.000000
+25%        -1.000000
+50%         1.000000
+75%         1.000000
+max         1.000000
+Name: target, dtype: float64
+0   -1
+1   -1
+2   -1
+3    1
+4    1
+Name: target, dtype: int64
+{'accuracy': 0.9696969696969697, 'balanced_accuracy': 0.9676994949073996, 'mcc': 0.9382994393297562, 'roc_auc': 0.9960438580406407, 'f1': 0.9735491512041059, 'precision': 0.9647887323943662, 'recall': 0.9824701195219123}
