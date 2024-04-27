@@ -1,0 +1,24 @@
+   city  area  rooms  ...  property_tax_(BRL)  fire_insurance_(BRL)    target
+0     4   200      3  ...                1000                    33  9.374243
+1     4   225      3  ...                 209                    35  7.841886
+2     1    53      1  ...                  15                     7  6.830874
+3     2    42      1  ...                  81                    36  8.060856
+4     4   101      2  ...                   0                    22  7.742836
+
+[5 rows x 12 columns]
+count    8553.000000
+mean        8.248353
+std         0.802445
+min         6.214608
+25%         7.636752
+50%         8.187855
+75%         8.830543
+max        13.928840
+Name: target, dtype: float64
+0     8.221560
+1     7.885052
+2     7.985975
+3     7.458922
+4    10.095316
+Name: target, dtype: float32
+{'root_mean_squared_error': -0.0218893713961219, 'mean_squared_error': -0.00047914458011735967, 'mean_absolute_error': -0.00784182514254815, 'r2': 0.9992151396753242, 'pearsonr': 0.999611671642228, 'median_absolute_error': -0.004814153724131742}

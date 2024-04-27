@@ -1,0 +1,24 @@
+   fixed_acidity  volatile_acidity  citric_acid  ...  sulphates  alcohol  target
+0            8.7             0.690         0.31  ...       0.74     11.6       6
+1            6.1             0.210         0.40  ...       0.59     11.9       6
+2           10.9             0.390         0.47  ...       0.75      9.8       6
+3            8.8             0.685         0.26  ...       0.47      9.4       5
+4            8.4             1.035         0.15  ...       0.49      9.9       5
+
+[5 rows x 12 columns]
+count    1279.000000
+mean        5.623925
+std         0.806909
+min         3.000000
+25%         5.000000
+50%         6.000000
+75%         6.000000
+max         8.000000
+Name: target, dtype: float64
+0    5
+1    5
+2    5
+3    5
+4    6
+Name: target, dtype: int64
+{'root_mean_squared_error': -0.6224949798994366, 'accuracy': 0.65, 'balanced_accuracy': 0.32132867132867154, 'mcc': 0.43807933399813903}

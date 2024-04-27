@@ -1,0 +1,28 @@
+    LATITUDE  LONGITUDE  LND_SQFOOT  ...  month_sold  structure_quality  target
+0  25.711931 -80.461265      5000.0  ...          11                  4    1176
+1  25.963556 -80.220152      6000.0  ...           9                  2     787
+2  25.697725 -80.330127     19122.0  ...           5                  5    1818
+3  25.718149 -80.444340      4428.0  ...           8                  4     787
+4  25.713545 -80.254013     20008.0  ...           6                  5    2073
+
+[5 rows x 16 columns]
+count    11145.000000
+mean       834.642979
+std        516.631599
+min          0.000000
+25%        430.000000
+50%        720.000000
+75%       1154.000000
+max       2110.000000
+Name: target, dtype: float64
+[1000]	valid_set's rmse: 120.551
+[2000]	valid_set's rmse: 119.709
+[1000]	valid_set's rmse: 118.908
+[1000]	valid_set's rmse: 120.172
+0     819.422546
+1     731.503296
+2     845.453125
+3    1648.850952
+4     418.982880
+Name: target, dtype: float32
+{'root_mean_squared_error': -119.44953961934019, 'mean_squared_error': -14268.192515272322, 'mean_absolute_error': -80.83257927396711, 'r2': 0.9476101889054791, 'pearsonr': 0.9734941911853958, 'median_absolute_error': -54.23699951171875}
