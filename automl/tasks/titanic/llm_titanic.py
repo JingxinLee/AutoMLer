@@ -13,7 +13,7 @@ import numpy as np
 
 # Load and preprocess the Titanic dataset
 df = pd.read_csv(
-    "/home/ddp/nlp/github/paper/mypaper_code/automl/data/titanic/train.csv"
+    "/root/paper/mypaper_code/automl/data/titanic/train.csv"
 )  # Make sure you have the Titanic dataset as "titanic.csv"
 df.fillna("", inplace=True)  # Simple way to handle missing values for this example
 
@@ -28,7 +28,8 @@ df["survived"] = le.fit_transform(df["survived"])
 train_df, eval_df = train_test_split(df, test_size=0.2)
 
 # Use a basic transformer model for sequence classification (you might need to adjust this)
-model_name = "distilbert-base-uncased"
+# model_name = "distilbert-base-uncased"
+model_name = "prajjwal1/bert-tiny"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
 
@@ -97,3 +98,9 @@ trainer.train()
 
 eval_results = trainer.evaluate()
 print(eval_results)
+
+# Distillbert
+# {'eval_loss': 0.030938012525439262, 'eval_accuracy': 1.0, 'eval_f1': 1.0, 'eval_runtime': 0.3242, 'eval_samples_per_second': 388.66, 'eval_steps_per_second': 24.677, 'epoch': 3.0}
+
+# TinyBert
+# {'eval_loss': 0.6110957264900208, 'eval_accuracy': 0.6984126984126984, 'eval_f1': 0.6984126984126984, 'eval_runtime': 0.0696, 'eval_samples_per_second': 1811.409, 'eval_steps_per_second': 230.02, 'epoch': 3.0}
